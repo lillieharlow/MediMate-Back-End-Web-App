@@ -32,7 +32,7 @@ router.post('/signup', validateSignup, async (request, response, next) => {
     await user.save();
     response.status(201).json({
       message: 'User created successfully',
-      userId: user.user_id,
+      userId: user._id,
     });
   } catch (error) {
     error.status = 400;
@@ -57,7 +57,7 @@ router.post('/login', async (request, response, next) => {
       return next(error);
     }
     const token = jwt.sign(
-      { userId: user.user_id, email: user.email },
+      { userId: user._id, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: '3d' }
     );

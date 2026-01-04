@@ -1,7 +1,6 @@
 /**
  * User Model: Handles user authentication and profile data
  * Defines user schema with:
- * - Custom user_id as primary key
  * - Email with validation
  * - Hashed password with bcryptjs
  * - Foreign key reference to UserType
@@ -21,7 +20,6 @@ const UserSchema = mongoose.Schema(
       ref: 'UserType',
       required: [true, 'User type is required'],
     },
-
     email: {
       type: String,
       required: [true, 'Email is required'],
@@ -31,7 +29,6 @@ const UserSchema = mongoose.Schema(
         message: 'Invalid email format',
       },
     },
-
     hashedPassword: {
       type: String,
       required: [true, 'Password is required'],
@@ -39,7 +36,7 @@ const UserSchema = mongoose.Schema(
       select: false,
     },
   },
-  { _id: 'user_id', timestamps: true }
+  { timestamps: true }
 );
 
 // ========== Password Hashing ==========
