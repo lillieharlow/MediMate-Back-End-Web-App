@@ -2,6 +2,7 @@
  * Doctor User Profile Model: Handles doctor profile data
  * Defines doctor profile schema with:
  * - _id is the primary key and foreign key to User
+ * - Doctor name fields
  * - Custom validation for shift start and end times
  * - Timestamps for tracking creation and updates
  */
