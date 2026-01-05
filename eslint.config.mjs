@@ -34,7 +34,7 @@ export default [
       'import/no-unresolved': 'error',
       'prefer-const': 'error',
       'no-var': 'error',
-      "no-underscore-dangle": ["error", { "allow": ["_id"]}],
+      'no-underscore-dangle': ['error', { allow: ['_id'] }],
       eqeqeq: ['error', 'always'],
     },
     settings: {
