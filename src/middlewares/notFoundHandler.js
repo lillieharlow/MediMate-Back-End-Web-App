@@ -10,7 +10,7 @@ const notFoundHandler = (request, response) => {
     message: 'Route not found',
     path: request.originalUrl,
     method: request.method,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 };
 

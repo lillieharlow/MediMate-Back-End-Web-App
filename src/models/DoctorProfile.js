@@ -28,7 +28,7 @@ const DoctorProfileSchema = mongoose.Schema(
       type: Date,
       required: [true, 'Shift end time is required'],
       validate: {
-        validator: function (value) {
+        validator(value) {
           return value >= new Date() && value > this.shiftStartTime;
         },
         message: 'Shift end time must be in the future and after shift start time',

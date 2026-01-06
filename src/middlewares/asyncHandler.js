@@ -4,7 +4,7 @@
  * - Wraps async route handlers to automatically catch promise rejections
  * - Passes caught errors to the global error handler
  * - Eliminates need for try/catch blocks in routes
- * 
+ *
  * Usage: router.post('/path', asyncHandler(async (req, res) => { ... }))
  */
 

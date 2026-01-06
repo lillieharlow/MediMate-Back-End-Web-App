@@ -40,7 +40,7 @@ const UserSchema = mongoose.Schema(
 );
 
 // ========== Password Hashing ==========
-UserSchema.pre('save', async function () {
+UserSchema.pre('save', async function hashPassword() {
   if (!this.isModified('hashedPassword')) return;
   const salt = await bcrypt.genSalt(12);
   this.hashedPassword = await bcrypt.hash(this.hashedPassword, salt);
@@ -48,9 +48,10 @@ UserSchema.pre('save', async function () {
 
 // ========== JSON Transformation ==========
 UserSchema.set('toJSON', {
-  transform: (doc, ret) => {
-    delete ret.hashedPassword;
-    return ret;
+  transform: (doc, returnObject) => {
+    const sanitized = { ...returnObject };
+    delete sanitized.hashedPassword;
+    return sanitized;
   },
 });
 
