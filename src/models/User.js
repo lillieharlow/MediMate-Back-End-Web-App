@@ -48,10 +48,10 @@ UserSchema.pre('save', async () => {
 
 // ========== JSON Transformation ==========
 UserSchema.set('toJSON', {
-  transform: (doc, ret) => {
-    const newReturn = { ...ret };
-    delete newReturn.hashedPassword;
-    return newReturn;
+  transform: (doc, returnObject) => {
+    const sanitized = { ...returnObject };
+    delete sanitized.hashedPassword;
+    return sanitized;
   },
 });
 
