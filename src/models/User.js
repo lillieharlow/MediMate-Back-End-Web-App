@@ -40,7 +40,7 @@ const UserSchema = mongoose.Schema(
 );
 
 // ========== Password Hashing ==========
-UserSchema.pre('save', async function hashPassword() {
+UserSchema.pre('save', async () => {
   if (!this.isModified('hashedPassword')) return;
   const salt = await bcrypt.genSalt(12);
   this.hashedPassword = await bcrypt.hash(this.hashedPassword, salt);
