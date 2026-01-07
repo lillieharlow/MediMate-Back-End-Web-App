@@ -2,9 +2,8 @@
  * User Model: Handles user authentication and profile data
  * Defines user schema with:
  * - Email with validation
- * - Hashed password with bcryptjs
+ * Hashed password (done in /routes/authRoutes.js)
  * - Foreign key reference to UserType
- * - Password hashing middleware
  * - JSON transformation for security
  */
 
