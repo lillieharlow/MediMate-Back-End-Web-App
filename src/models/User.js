@@ -9,7 +9,6 @@
  */
 
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 const validator = require('validator');
 
 // ========== User Schema ==========
@@ -38,13 +37,6 @@ const UserSchema = mongoose.Schema(
   },
   { timestamps: true }
 );
-
-// ========== Password Hashing ==========
-UserSchema.pre('save', async () => {
-  if (!this.isModified('hashedPassword')) return;
-  const salt = await bcrypt.genSalt(12);
-  this.hashedPassword = await bcrypt.hash(this.hashedPassword, salt);
-});
 
 // ========== JSON Transformation ==========
 UserSchema.set('toJSON', {

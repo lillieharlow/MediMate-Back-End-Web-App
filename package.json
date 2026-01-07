@@ -7,7 +7,11 @@
     "start": "node --env-file-if-exists=.env src/server.js",
     "dev": "node --watch --env-file-if-exists=.env src/server.js",
     "lint": "eslint src/**/*.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --watch"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": ["<rootDir>/tests/setupMongo.js"]
   },
   "repository": {
     "type": "git",
@@ -41,6 +45,9 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^7.2.1",
     "globals": "^17.0.0",
-    "prettier": "^3.7.4"
+    "jest": "^30.2.0",
+    "mongodb-memory-server": "^11.0.1",
+    "prettier": "^3.7.4",
+    "supertest": "^7.2.2"
   }
 }
