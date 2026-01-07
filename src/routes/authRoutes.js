@@ -6,9 +6,11 @@
  * - POST /api/v1/auth/login        : User login (public)
  *
  * Features:
- * - Password hashing with bcryptjs
+ * - Password hashing with bcryptjs (route-level, before save)
  * - JWT token generation (8h expiry)
- * - Input validation middleware
+ * - Input validation middleware (express-validator)
+ * - Auto-assigns 'patient' user type (upserts if missing)
+ * - checks for existing email on signup (unique constraint)
  *
  * Error Handling:
  * - asyncHandler automatically catches errors thrown in async functions
@@ -22,8 +24,8 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
 const User = require('../models/User');
+const UserType = require('../models/UserTypes');
 const validateSignup = require('../middlewares/validateSignup');
 const validateLogin = require('../middlewares/validateLogin');
 const asyncHandler = require('../middlewares/asyncHandler');
@@ -46,7 +48,11 @@ router.post(
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Auto assign 'patient' userType. Only staff can change to 'staff' or 'doctor'.
-    const patientType = await mongoose.model('UserType').findOne({ typeName: 'patient' });
+    const patientType = await UserType.findOneAndUpdate(
+      { typeName: 'patient' },
+      { $setOnInsert: { typeName: 'patient' } },
+      { upsert: true, new: true }
+    );
 
     const user = new User({ email, hashedPassword, userType: patientType._id });
     await user.save();
