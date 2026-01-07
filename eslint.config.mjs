@@ -16,13 +16,15 @@ const compat = new FlatCompat({
 
 export default [
   ...compat.extends('airbnb'),
-  { ignores: ['node_modules/**', 'dist/**'] },
+  { ignores: ['node_modules/**', 'dist/**', 'eslint.config.mjs'] },
   {
     files: ['**/*.js'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
-      globals: globals.node,
+      globals: {
+        ...globals.node,
+      },
     },
     plugins: {
       import: importPlugin,
@@ -40,6 +42,15 @@ export default [
     settings: {
       'import/resolver': {
         node: { extensions: ['.js', '.mjs'] },
+      },
+    },
+  },
+  {
+    files: ['tests/**/*.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.jest,
       },
     },
   },
