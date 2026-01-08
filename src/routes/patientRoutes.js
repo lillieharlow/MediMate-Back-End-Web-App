@@ -13,6 +13,7 @@ const express = require('express');
 const PatientProfile = require('../models/PatientProfile');
 const asyncHandler = require('../middlewares/asyncHandler');
 const jwtAuth = require('../middlewares/jwtAuth');
+const authorizeUserTypes = require('../middlewares/authorizeUserTypes');
 const createError = require('../utils/httpError');
 
 const router = express.Router();
@@ -21,6 +22,7 @@ const router = express.Router();
 router.post(
   '/',
   jwtAuth,
+  authorizeUserTypes('staff', 'patient'),
   asyncHandler(async (request, response) => {
     const { firstName, middleName, lastName, dateOfBirth, phone } = request.body;
 
