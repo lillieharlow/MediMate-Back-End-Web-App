@@ -1,8 +1,8 @@
 /**
- * Jest Test Setup: In-memory MongoDB for Jest
+ * Test Setup: Global infastructure (DB, config) for tests.
  *
  * Spins up a temporary MongoDB instance for each test run.
- * Database gets wiped between tests so they don't interfere with each other.
+ * Database gets dropped/wiped between tests to ensure isolation.
  *
  * Sets JWT_SECRET=test-secret for auth route tests.
  */
@@ -11,6 +11,7 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 const mongoose = require('mongoose');
 
 let mongo;
+
 beforeAll(async () => {
   process.env.JWT_SECRET = 'test-secret';
   mongo = await MongoMemoryServer.create();
@@ -23,3 +24,26 @@ afterAll(async () => {
   await mongoose.disconnect();
   await mongo.stop();
 });
+
+const testData = {
+  validUser: {
+    email: 'test@example.com',
+    password: 'password123',
+  },
+  patientUser: {
+    email: 'patient@example.com',
+    password: 'password123',
+  },
+  staffUser: {
+    email: 'staff@example.com',
+    password: 'password123',
+  },
+  validPatient: {
+    firstName: 'Alice',
+    lastName: 'Smith',
+    dateOfBirth: '1990-05-15',
+    phone: '1234567890',
+  },
+};
+
+module.exports = { testData };
