@@ -2,10 +2,12 @@
  * Patient Routes Tests
  *
  * Tests CRUD operations for patient profiles:
- * - Create patient profile (staff & patient only)
- * - List all patients (staff only)
+ * - Create patient profile (patient token)
+ * - List all patients (non-staff receives 403)
  * - Get one patient by userId (patient can access own profile)
  * - Patient cannot access another patient's profile (403 forbidden)
+ * - Patient can update own profile
+ * - Patient cannot delete own profile (403 forbidden)
  *
  * Uses Supertest to test routes without starting the actual server.
  */
@@ -13,6 +15,8 @@
 const request = require('supertest');
 const app = require('../src/index');
 const { testData } = require('./setupMongo');
+const User = require('../src/models/User');
+const UserType = require('../src/models/UserTypes');
 
 describe('Patient Routes: CRUD operations for /api/v1/patients', () => {
   let token;
@@ -63,6 +67,35 @@ describe('Patient Routes: CRUD operations for /api/v1/patients', () => {
 
     const res = await request(app)
       .get(`/api/v1/patients/${otherUserId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  test('PATCH /patients/:userId - patient should update own profile', async () => {
+    await request(app)
+      .post('/api/v1/patients')
+      .set('Authorization', `Bearer ${token}`)
+      .send(testData.validPatient);
+
+    const res = await request(app)
+      .patch(`/api/v1/patients/${userId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ phone: '5551234567' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.phone).toBe('5551234567');
+  });
+
+  test('DELETE /patients/:userId - patient cannot delete own profile', async () => {
+    await request(app)
+      .post('/api/v1/patients')
+      .set('Authorization', `Bearer ${token}`)
+      .send(testData.validPatient);
+
+    const res = await request(app)
+      .delete(`/api/v1/patients/${userId}`)
       .set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(403);

@@ -34,6 +34,10 @@ const testData = {
     email: 'patient@example.com',
     password: 'password123',
   },
+  staffUser: {
+    email: 'staff@example.com',
+    password: 'password123',
+  },
   validPatient: {
     firstName: 'Alice',
     lastName: 'Smith',
