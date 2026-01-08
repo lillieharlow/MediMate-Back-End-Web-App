@@ -82,14 +82,17 @@ router.post(
       throw createError('Invalid email or password', 401);
     }
 
-    const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, {
-      expiresIn: '8h',
-    });
+    const token = jwt.sign(
+      { userId: user._id, email: user.email, userType: user.userType.typeName },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '8h',
+      }
+    );
 
     response.json({
       success: true,
       token,
-      userType: user.userType,
     });
   })
 );
