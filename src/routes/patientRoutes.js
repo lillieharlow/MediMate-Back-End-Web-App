@@ -52,4 +52,20 @@ router.post(
   })
 );
 
+// ========== GET /api/v1/patients — List all patients (staff only) ==========
+router.get(
+  '/',
+  jwtAuth,
+  authorizeUserTypes('staff'),
+  asyncHandler(async (request, response) => {
+    const patients = await PatientProfile.find();
+    
+    response.status(200).json({
+      success: true,
+      count: patients.length,
+      data: patients,
+    });
+  })
+);
+
 module.exports = router;
