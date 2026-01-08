@@ -15,8 +15,6 @@
 const request = require('supertest');
 const app = require('../src/index');
 const { testData } = require('./setupMongo');
-const User = require('../src/models/User');
-const UserType = require('../src/models/UserTypes');
 
 describe('Patient Routes: CRUD operations for /api/v1/patients', () => {
   let token;
