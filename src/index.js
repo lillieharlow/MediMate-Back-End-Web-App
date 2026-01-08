@@ -35,6 +35,7 @@ const notFoundHandler = require('./middlewares/notFoundHandler');
 const globalErrorHandler = require('./middlewares/globalErrorHandler');
 
 const authRouter = require('./routes/authRoutes');
+const patientRouter = require('./routes/patientRoutes');
 
 const app = express();
 
@@ -57,6 +58,7 @@ app.use(limiter);
 
 const mountRoutes = () => {
   app.use('/api/v1/auth', authRouter);
+  app.use('/api/v1/patients', patientRouter);
   // Add other routes here
 };
 

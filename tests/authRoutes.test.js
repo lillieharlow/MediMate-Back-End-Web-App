@@ -4,16 +4,14 @@
  * Tests signup and login endpoints:
  * - New user registration (success + duplicate email)
  * - User login (success + wrong password)
- *
- * Uses Supertest to hit routes without starting the actual server.
  */
 
 const request = require('supertest');
 const app = require('../src/index');
+const { testData } = require('./setupMongo');
 
 describe('Auth Routes: Signup and login for /api/v1/auth', () => {
-  const email = 'test@example.com';
-  const password = 'password123';
+  const { email, password } = testData.validUser;
 
   test('POST /signup - should register a new user', async () => {
     const res = await request(app).post('/api/v1/auth/signup').send({ email, password });
