@@ -3,14 +3,17 @@
  *
  * Handles HTTP endpoints for patient profiles:
  * - POST /api/v1/patients          : Create patient profile (staff & patient only)
- * - GET /api/v1/patients/:userId   : Get patient by userId (staff all, doctor & patient self)
+ * - GET /api/v1/patients/:userId   : Get patient by userId (Staff all,
+ *      patients self, doctors with bookings for that patient)
+ * - GET /api/v1/patients           : List all patients (staff only)
  * - PATCH /api/v1/patients/:userId : Update patient profile (staff & patient only)
  * - DELETE /api/v1/patients/:userId: Delete patient (staff only)
- * - GET /api/v1/patients           : List all patients (staff only)
  */
 
 const express = require('express');
 const PatientProfile = require('../models/PatientProfile');
+const Booking = require('../models/Bookings');
+const User = require('../models/User');
 const asyncHandler = require('../middlewares/asyncHandler');
 const jwtAuth = require('../middlewares/jwtAuth');
 const authorizeUserTypes = require('../middlewares/authorizeUserTypes');
@@ -52,6 +55,44 @@ router.post(
   })
 );
 
+// ========== GET /api/v1/patients/:userId — Get one patient by userId ==========
+// Authorised: Staff all, patients self, doctors with bookings for that patient
+router.get(
+  '/:userId',
+  jwtAuth,
+  authorizeUserTypes('staff', 'doctor', 'patient'),
+  asyncHandler(async (request, response) => {
+    const { userId } = request.params;
+    const requestingUserId = request.user.userId;
+
+    const requestingUser = await User.findById(requestingUserId).populate('userType');
+    const userTypeName = requestingUser.userType.typeName;
+
+    if (userTypeName === 'patient') {
+      if (requestingUserId !== userId) {
+        throw createError('You do not have permission to access this profile', 403);
+      }
+    } else if (userTypeName === 'doctor') {
+      const booking = await Booking.findOne({
+        doctorId: requestingUserId,
+        patientId: userId,
+      });
+
+      if (!booking) {
+        throw createError('You do not have permission to access this profile', 403);
+      }
+    }
+
+    const patient = await PatientProfile.findById(userId);
+
+    if (!patient) {
+      throw createError('Patient profile not found', 404);
+    }
+
+    response.status(200).json(patient);
+  })
+);
+
 // ========== GET /api/v1/patients — List all patients (staff only) ==========
 router.get(
   '/',
@@ -59,7 +100,7 @@ router.get(
   authorizeUserTypes('staff'),
   asyncHandler(async (request, response) => {
     const patients = await PatientProfile.find();
-    
+
     response.status(200).json({
       success: true,
       count: patients.length,

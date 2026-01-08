@@ -1,12 +1,13 @@
 /**
  * Patient Routes Tests
  *
- * Tests endpoints:
- * - POST patient (staff & patient only) - /api/v1/patients
- * - GET - list all patients (staff only) - /api/v1/patients
- * - GET - one patient (staff all, doctor & patient only self) - /api/v1/patients/:userId
- * - PATCH patient (staff & patient only) - /api/v1/patients/:userId
- * - DELETE patient (staff only) - /api/v1/patients/:userId
+ * Tests CRUD operations for patient profiles:
+ * - Create patient profile (staff & patient only)
+ * - List all patients (staff only)
+ * - Get one patient by userId (patient can access own profile)
+ * - Patient cannot access another patient's profile (403 forbidden)
+ *
+ * Uses Supertest to test routes without starting the actual server.
  */
 
 const request = require('supertest');
@@ -20,7 +21,7 @@ describe('Patient Routes: CRUD operations for /api/v1/patients', () => {
   beforeEach(async () => {
     const signupRes = await request(app).post('/api/v1/auth/signup').send(testData.patientUser);
     userId = signupRes.body.userId;
-    
+
     const loginRes = await request(app).post('/api/v1/auth/login').send(testData.patientUser);
     token = loginRes.body.token;
   });
@@ -38,6 +39,31 @@ describe('Patient Routes: CRUD operations for /api/v1/patients', () => {
 
   test('GET /patients - should return 403 for non-staff users', async () => {
     const res = await request(app).get('/api/v1/patients').set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  test('GET /patients/:userId - should only get own patient profile', async () => {
+    await request(app)
+      .post('/api/v1/patients')
+      .set('Authorization', `Bearer ${token}`)
+      .send(testData.validPatient);
+
+    const res = await request(app)
+      .get(`/api/v1/patients/${userId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.firstName).toBe(testData.validPatient.firstName);
+    expect(res.body.lastName).toBe(testData.validPatient.lastName);
+  });
+
+  test('GET /patients/:userId - patient should NOT access another patient profile', async () => {
+    const otherUserId = '507f1f77bcf86cd799439011'; // Random MongoDB ObjectId
+
+    const res = await request(app)
+      .get(`/api/v1/patients/${otherUserId}`)
+      .set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(403);
   });
