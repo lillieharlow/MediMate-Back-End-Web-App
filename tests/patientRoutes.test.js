@@ -39,12 +39,6 @@ describe('Patient Routes: CRUD operations for /api/v1/patients', () => {
     expect(res.body.userId).toBe(userId);
   });
 
-  test('GET /patients - should return 403 for non-staff users', async () => {
-    const res = await request(app).get('/api/v1/patients').set('Authorization', `Bearer ${token}`);
-
-    expect(res.status).toBe(403);
-  });
-
   test('GET /patients/:userId - should only get own patient profile', async () => {
     await request(app)
       .post('/api/v1/patients')

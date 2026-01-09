@@ -4,6 +4,7 @@
  * - _id is the primary key and foreign key to User
  * - Patient personal information fields
  * - Timestamps for tracking creation and updates
+ * - toJSON transformation to format dateOfBirth and exclude "__v" from API responses
  */
 
 const mongoose = require('mongoose');
@@ -48,7 +49,17 @@ const PatientProfileSchema = mongoose.Schema(
       },
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      transform: (_, { dateOfBirth, createdAt, updatedAt, __v, ...rest }) => ({
+        ...rest,
+        dateOfBirth: dateOfBirth ? dateOfBirth.toISOString().split('T')[0] : dateOfBirth,
+        createdAt,
+        updatedAt,
+      }),
+    },
+  }
 );
 
 module.exports = mongoose.model('PatientProfile', PatientProfileSchema);

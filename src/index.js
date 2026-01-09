@@ -36,6 +36,7 @@ const globalErrorHandler = require('./middlewares/globalErrorHandler');
 
 const authRouter = require('./routes/authRoutes');
 const patientRouter = require('./routes/patientRoutes');
+const staffRouter = require('./routes/staffRoutes');
 
 const app = express();
 
@@ -59,6 +60,7 @@ app.use(limiter);
 const mountRoutes = () => {
   app.use('/api/v1/auth', authRouter);
   app.use('/api/v1/patients', patientRouter);
+  app.use('/api/v1/staff', staffRouter);
   // Add other routes here
 };
 
