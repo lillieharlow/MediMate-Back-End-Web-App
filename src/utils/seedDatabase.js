@@ -1,3 +1,9 @@
+/**
+ * Database seeding helper
+ * - Ensures patient/staff/doctor user types exist
+ * - Creates a default staff user (staff@medimate.com / staff123)
+ */
+
 const bcrypt = require('bcryptjs');
 
 const User = require('../models/User');

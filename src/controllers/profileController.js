@@ -1,6 +1,6 @@
 /**
  * Profile Controller: Reusable CRUD operations for all profile types
- * 
+ *
  * Shared business logic for:
  * - Creating profiles (patient, staff, doctor)
  * - Retrieving profiles by ID
@@ -31,7 +31,7 @@ const createProfile = async (Model, userId, profileData) => {
 // ========== Get Profile By ID ==========
 const getProfileById = async (Model, userId) => {
   const profile = await Model.findById(userId);
-  
+
   if (!profile) {
     throw createError('Profile not found', 404);
   }
@@ -62,7 +62,7 @@ const updateProfile = async (Model, userId, updateData) => {
 // ========== Delete Profile ==========
 const deleteProfile = async (Model, userId) => {
   const deleted = await Model.findByIdAndDelete(userId);
-  
+
   if (!deleted) {
     throw createError('Profile not found', 404);
   }
