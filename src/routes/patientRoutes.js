@@ -2,51 +2,44 @@
  * Patient Routes: Patient profile CRUD operations
  *
  * Handles HTTP endpoints for patient profiles:
- * - POST /api/v1/patients          : Create patient profile (staff & patient only)
+ * - POST /api/v1/patients          : Create patient profile (patient only)
  * - GET /api/v1/patients/:userId   : Get patient by userId (Staff all,
  *      patients self, doctors with bookings for that patient)
- * - GET /api/v1/patients           : List all patients (staff only)
  * - PATCH /api/v1/patients/:userId : Update patient profile (staff & patient only)
  * - DELETE /api/v1/patients/:userId: Delete patient (staff only)
  */
 
 const express = require('express');
-const PatientProfile = require('../models/PatientProfile');
-const Booking = require('../models/Bookings');
-const User = require('../models/User');
+
+const profileController = require('../controllers/profileController');
 const asyncHandler = require('../middlewares/asyncHandler');
-const jwtAuth = require('../middlewares/jwtAuth');
 const authorizeUserTypes = require('../middlewares/authorizeUserTypes');
+const jwtAuth = require('../middlewares/jwtAuth');
+const validateFields = require('../middlewares/validateFields');
+const Booking = require('../models/Bookings');
+const PatientProfile = require('../models/PatientProfile');
+const User = require('../models/User');
 const createError = require('../utils/httpError');
 
 const router = express.Router();
 
 // ========== POST /api/v1/patients — Create patient profile ==========
-// Authorized: Staff and patient only
+// Authorized: Patient only
 router.post(
   '/',
   jwtAuth,
-  authorizeUserTypes('staff', 'patient'),
+  authorizeUserTypes('patient'),
   asyncHandler(async (request, response) => {
     const { firstName, middleName, lastName, dateOfBirth, phone } = request.body;
-
     const { userId } = request.user;
 
-    const existingPatient = await PatientProfile.findById(userId);
-    if (existingPatient) {
-      throw createError('Patient profile already exists', 409);
-    }
-
-    const patient = new PatientProfile({
-      _id: userId,
+    const patient = await profileController.createProfile(PatientProfile, userId, {
       firstName,
       middleName,
       lastName,
       dateOfBirth,
       phone,
     });
-
-    await patient.save();
 
     response.status(201).json({
       success: true,
@@ -84,30 +77,9 @@ router.get(
       }
     }
 
-    const patient = await PatientProfile.findById(userId);
-
-    if (!patient) {
-      throw createError('Patient profile not found', 404);
-    }
+    const patient = await profileController.getProfileById(PatientProfile, userId);
 
     response.status(200).json(patient);
-  })
-);
-
-// ========== GET /api/v1/patients — List all patients ==========
-// Authorized: Staff only
-router.get(
-  '/',
-  jwtAuth,
-  authorizeUserTypes('staff'),
-  asyncHandler(async (request, response) => {
-    const patients = await PatientProfile.find();
-
-    response.status(200).json({
-      success: true,
-      count: patients.length,
-      data: patients,
-    });
   })
 );
 
@@ -117,6 +89,7 @@ router.patch(
   '/:userId',
   jwtAuth,
   authorizeUserTypes('staff', 'patient'),
+  validateFields(['firstName', 'middleName', 'lastName', 'dateOfBirth', 'phone']),
   asyncHandler(async (request, response) => {
     const { userId } = request.params;
     const requestingUserId = request.user.userId;
@@ -135,14 +108,7 @@ router.patch(
     if (dateOfBirth !== undefined) update.dateOfBirth = dateOfBirth;
     if (phone !== undefined) update.phone = phone;
 
-    const updated = await PatientProfile.findByIdAndUpdate(userId, update, {
-      new: true,
-      runValidators: true,
-    });
-
-    if (!updated) {
-      throw createError('Patient profile not found', 404);
-    }
+    const updated = await profileController.updateProfile(PatientProfile, userId, update);
 
     response.status(200).json({ success: true, data: updated });
   })
@@ -157,10 +123,7 @@ router.delete(
   asyncHandler(async (request, response) => {
     const { userId } = request.params;
 
-    const deleted = await PatientProfile.findByIdAndDelete(userId);
-    if (!deleted) {
-      throw createError('Patient profile not found', 404);
-    }
+    await profileController.deleteProfile(PatientProfile, userId);
 
     response.status(200).json({ success: true, message: 'Patient profile deleted' });
   })

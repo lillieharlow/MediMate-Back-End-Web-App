@@ -21,14 +21,15 @@
  * - Error: { success: false, status, message, timestamp }
  */
 
-const express = require('express');
 const bcrypt = require('bcryptjs');
+const express = require('express');
 const jwt = require('jsonwebtoken');
+
+const asyncHandler = require('../middlewares/asyncHandler');
+const validateLogin = require('../middlewares/validateLogin');
+const validateSignup = require('../middlewares/validateSignup');
 const User = require('../models/User');
 const UserType = require('../models/UserTypes');
-const validateSignup = require('../middlewares/validateSignup');
-const validateLogin = require('../middlewares/validateLogin');
-const asyncHandler = require('../middlewares/asyncHandler');
 const createError = require('../utils/httpError');
 
 const router = express.Router();
