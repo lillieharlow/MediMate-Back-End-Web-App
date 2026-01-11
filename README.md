@@ -8,7 +8,30 @@
 * Dangling underscores are allowed for MongoDB default ID field `_id`.
 
 
-## Reference List:
+## API Endpoints
+# Public
+* GET homepage - /api/v1/
+
+# Auth
+* POST register - /api/v1/auth/register
+* POST login - /api/v1/auth/login
+
+# Patients
+* POST - Create patient profile (patient only) - /api/v1/patients
+* GET - Get patient by userId (Staff all, patients self, doctors with bookings for that patient) - /api/v1/patients/:userId 
+* PATCH - Update patient profile (staff & patient only) - /api/v1/patients/:userId 
+* DELETE - Delete patient (staff only) - /api/v1/patients/:userId
+
+# Staff
+* PATCH - Change user type (staff only) - /api/v1/staff/userType/:userId
+* POST - Create staff profile (staff only) - /api/v1/staff
+* GET - Get staff by userId (staff only) - /api/v1/staff/:userId  
+* GET - List all staff (staff only) - /api/v1/staff
+* GET - List all patients (staff only) - /api/v1/staff/patients
+* PATCH - Update staff profile (staff only) - /api/v1/staff/:userId
+* DELETE - Delete staff (staff only) - /api/v1/staff/:userId  
+
+## Reference List
 Express-validator. (2025) *express-validator*, https://express-validator.github.io/docs, accessed: 5 January 2025.
 
 Iqbal, K. (2025) *Authentication with JWT in MERN (Step-by-Step Guide)*, https://mernblog.com/blog/authentication-jwt-mern, accessed: 5 January 2025.
