@@ -38,11 +38,21 @@ const testData = {
     email: 'staff@example.com',
     password: 'password123',
   },
+  doctorUser: {
+    email: 'doctor@example.com',
+    password: 'password123',
+  },
   validPatient: {
     firstName: 'Alice',
     lastName: 'Smith',
     dateOfBirth: '1990-05-15',
     phone: '1234567890',
+  },
+  validDoctor: {
+    firstName: 'Dr. John',
+    lastName: 'Doe',
+    specialization: 'Cardiology',
+    licenseNumber: 'MD123456',
   },
 };
 
