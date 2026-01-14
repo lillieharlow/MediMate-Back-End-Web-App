@@ -50,8 +50,8 @@ describe('Patient Routes: CRUD operations for /api/v1/patients', () => {
       .set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(200);
-    expect(res.body.firstName).toBe(testData.validPatient.firstName);
-    expect(res.body.lastName).toBe(testData.validPatient.lastName);
+    expect(res.body.data.firstName).toBe(testData.validPatient.firstName);
+    expect(res.body.data.lastName).toBe(testData.validPatient.lastName);
   });
 
   test('GET /patients/:userId - patient should NOT access another patient profile', async () => {
