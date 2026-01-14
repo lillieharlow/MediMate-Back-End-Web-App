@@ -96,7 +96,10 @@ router.get(
 
     const staff = await profileController.getProfileById(StaffProfile, userId);
 
-    response.status(200).json(staff);
+    response.status(200).json({
+      success: true,
+      data: staff,
+    });
   })
 );
 
@@ -151,7 +154,10 @@ router.patch(
 
     const updated = await profileController.updateProfile(StaffProfile, userId, update);
 
-    response.status(200).json({ success: true, data: updated });
+    response.status(200).json({
+      success: true,
+      data: updated,
+    });
   })
 );
 
@@ -166,7 +172,10 @@ router.delete(
 
     await profileController.deleteProfile(StaffProfile, userId);
 
-    response.status(200).json({ success: true, message: 'Staff profile deleted' });
+    response.status(200).json({
+      success: true,
+      message: 'Staff profile deleted',
+    });
   })
 );
 
