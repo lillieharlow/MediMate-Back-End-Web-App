@@ -49,10 +49,10 @@ const testData = {
     phone: '1234567890',
   },
   validDoctor: {
-    firstName: 'Dr. John',
-    lastName: 'Doe',
-    specialization: 'Cardiology',
-    licenseNumber: 'MD123456',
+    shiftStartTime: null,
+    shiftEndTime: null,
+    firstName: 'John',
+    lastName: 'Doctor',
   },
 };
 
