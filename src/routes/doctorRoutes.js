@@ -40,7 +40,7 @@ router.get(
 );
 
 // ========== GET /api/v1/doctors/:userId — Get one doctor ==========
-// Authorized: Staff and the doctor self
+// Authorized: Staff and doctor self
 router.get(
   '/:userId',
   jwtAuth,
@@ -56,7 +56,10 @@ router.get(
 
     const doctor = await profileController.getProfileById(DoctorProfile, userId);
 
-    response.status(200).json(doctor);
+    response.status(200).json({
+      success: true,
+      data: doctor,
+    });
   })
 );
 
@@ -86,7 +89,7 @@ router.post(
 );
 
 // ========== PATCH /api/v1/doctors/:userId — Update doctor profile ==========
-// Authorized: Staff and the doctor self
+// Authorized: Staff and doctor self
 router.patch(
   '/:userId',
   jwtAuth,
@@ -107,11 +110,11 @@ router.patch(
     if (firstName !== undefined) update.firstName = firstName;
     if (lastName !== undefined) update.lastName = lastName;
 
-    const updated = await profileController.updateProfile(DoctorProfile, userId, update);
+    const updatedDoctor = await profileController.updateProfile(DoctorProfile, userId, update);
 
     response.status(200).json({
       success: true,
-      data: updated,
+      data: updatedDoctor,
     });
   })
 );
@@ -127,7 +130,10 @@ router.delete(
 
     await profileController.deleteProfile(DoctorProfile, userId);
 
-    response.status(200).json({ success: true, message: 'Doctor profile deleted successfully' });
+    response.status(200).json({
+      success: true,
+      message: 'Doctor profile deleted successfully',
+    });
   })
 );
 
