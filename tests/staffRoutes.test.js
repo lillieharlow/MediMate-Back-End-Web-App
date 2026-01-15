@@ -10,29 +10,15 @@
 
 const request = require('supertest');
 const app = require('../src/index');
-const User = require('../src/models/User');
-const UserType = require('../src/models/UserTypes');
 const { testData } = require('./setupMongo');
-
-const ensureType = async (typeName) =>
-  UserType.findOneAndUpdate({ typeName }, { $setOnInsert: { typeName } }, { upsert: true, new: true });
-
-const createStaffUserAndToken = async () => {
-  const staffType = await ensureType('staff');
-  await ensureType('doctor'); // used in the userType change test
-  const signupRes = await request(app).post('/api/v1/auth/signup').send(testData.staffUser);
-  const { userId } = signupRes.body;
-  await User.findByIdAndUpdate(userId, { userType: staffType._id });
-  const loginRes = await request(app).post('/api/v1/auth/login').send(testData.staffUser);
-  return { token: loginRes.body.token, userId };
-};
+const { createStaffUserAndToken } = require('./testUtils');
 
 describe('Staff Routes: /api/v1/staff', () => {
   let staffToken;
   let staffUserId;
 
   beforeEach(async () => {
-    const staff = await createStaffUserAndToken();
+    const staff = await createStaffUserAndToken(app);
     staffToken = staff.token;
     staffUserId = staff.userId;
   });
@@ -48,7 +34,7 @@ describe('Staff Routes: /api/v1/staff', () => {
     expect(res.body.userId).toBe(staffUserId);
   });
 
-  test('GET /staff/:userId returns staff profile', async () => {
+  test('GET /staff/:userId - should return one staff profile', async () => {
     await request(app)
       .post('/api/v1/staff')
       .set('Authorization', `Bearer ${staffToken}`)
@@ -59,10 +45,10 @@ describe('Staff Routes: /api/v1/staff', () => {
       .set('Authorization', `Bearer ${staffToken}`);
 
     expect(res.status).toBe(200);
-    expect(res.body.firstName).toBe('Sam');
+    expect(res.body.data.firstName).toBe('Sam');
   });
 
-  test('PATCH /staff/:userId updates staff profile', async () => {
+  test('PATCH /staff/:userId - should update staff profile', async () => {
     await request(app)
       .post('/api/v1/staff')
       .set('Authorization', `Bearer ${staffToken}`)
@@ -77,7 +63,7 @@ describe('Staff Routes: /api/v1/staff', () => {
     expect(res.body.data.lastName).toBe('Chen');
   });
 
-  test('GET /staff lists staff', async () => {
+  test('GET /staff - should list all staff', async () => {
     await request(app)
       .post('/api/v1/staff')
       .set('Authorization', `Bearer ${staffToken}`)
@@ -91,7 +77,7 @@ describe('Staff Routes: /api/v1/staff', () => {
     expect(res.body.count).toBe(1);
   });
 
-  test('PATCH /staff/userType/:userId changes user type to doctor', async () => {
+  test('PATCH /staff/userType/:userId - should change user type of profile to doctor', async () => {
     const patientSignup = await request(app).post('/api/v1/auth/signup').send(testData.patientUser);
     const targetUserId = patientSignup.body.userId;
 
@@ -104,7 +90,7 @@ describe('Staff Routes: /api/v1/staff', () => {
     expect(res.body.data.userType.typeName).toBe('doctor');
   });
 
-  test('DELETE /staff/:userId deletes staff profile', async () => {
+  test('DELETE /staff/:userId - should delete a staff profile', async () => {
     await request(app)
       .post('/api/v1/staff')
       .set('Authorization', `Bearer ${staffToken}`)

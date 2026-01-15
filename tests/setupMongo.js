@@ -2,13 +2,14 @@
  * Test Setup: Global infastructure (DB, config) for tests.
  *
  * Spins up a temporary MongoDB instance for each test run.
- * Database gets dropped/wiped between tests to ensure isolation.
+ * Database gets dropped and seeded before each test.
  *
  * Sets JWT_SECRET=test-secret for auth route tests.
  */
 
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const mongoose = require('mongoose');
+const { seedUserTypes } = require('../src/utils/seedDatabase');
 
 let mongo;
 
@@ -19,6 +20,7 @@ beforeAll(async () => {
 });
 beforeEach(async () => {
   await mongoose.connection.db.dropDatabase();
+  await seedUserTypes();
 });
 afterAll(async () => {
   await mongoose.disconnect();
@@ -38,11 +40,21 @@ const testData = {
     email: 'staff@example.com',
     password: 'password123',
   },
+  doctorUser: {
+    email: 'doctor@example.com',
+    password: 'password123',
+  },
   validPatient: {
     firstName: 'Alice',
     lastName: 'Smith',
     dateOfBirth: '1990-05-15',
     phone: '1234567890',
+  },
+  validDoctor: {
+    shiftStartTime: null,
+    shiftEndTime: null,
+    firstName: 'John',
+    lastName: 'Doctor',
   },
 };
 

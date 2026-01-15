@@ -79,7 +79,10 @@ router.get(
 
     const patient = await profileController.getProfileById(PatientProfile, userId);
 
-    response.status(200).json(patient);
+    response.status(200).json({
+      success: true,
+      data: patient,
+    });
   })
 );
 
@@ -110,7 +113,10 @@ router.patch(
 
     const updated = await profileController.updateProfile(PatientProfile, userId, update);
 
-    response.status(200).json({ success: true, data: updated });
+    response.status(200).json({
+      success: true,
+      data: updated,
+    });
   })
 );
 
@@ -125,7 +131,10 @@ router.delete(
 
     await profileController.deleteProfile(PatientProfile, userId);
 
-    response.status(200).json({ success: true, message: 'Patient profile deleted' });
+    response.status(200).json({
+      success: true,
+      message: 'Patient profile deleted',
+    });
   })
 );
 

@@ -54,4 +54,8 @@ const seedDatabase = async () => {
   await seedStaffUser();
 };
 
-module.exports = seedDatabase;
+module.exports = {
+  seedDatabase,
+  seedUserTypes,
+  seedStaffUser,
+};
