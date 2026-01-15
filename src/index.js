@@ -38,6 +38,7 @@ const authRouter = require('./routes/authRoutes');
 const patientRouter = require('./routes/patientRoutes');
 const staffRouter = require('./routes/staffRoutes');
 const doctorRouter = require('./routes/doctorRoutes');
+const bookingRouter = require('./routes/bookingRoutes');
 
 const app = express();
 
@@ -63,7 +64,7 @@ const mountRoutes = () => {
   app.use('/api/v1/patients', patientRouter);
   app.use('/api/v1/staff', staffRouter);
   app.use('/api/v1/doctors', doctorRouter);
-  // Add other routes here
+  app.use('/api/v1/bookings', bookingRouter);
 };
 
 mountRoutes();
