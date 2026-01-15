@@ -13,45 +13,8 @@
 
 const request = require('supertest');
 const app = require('../src/index');
-const User = require('../src/models/User');
-const UserType = require('../src/models/UserTypes');
-const { testData } = require('./setupMongo');
-
-const ensureType = async (typeName) =>
-  UserType.findOneAndUpdate(
-    { typeName },
-    { $setOnInsert: { typeName } },
-    { upsert: true, new: true }
-  );
-
-const createStaffUserAndToken = async () => {
-  const staffType = await ensureType('staff');
-  const signupRes = await request(app).post('/api/v1/auth/signup').send(testData.staffUser);
-  const { userId } = signupRes.body;
-  await User.findByIdAndUpdate(userId, { userType: staffType._id });
-  const loginRes = await request(app).post('/api/v1/auth/login').send(testData.staffUser);
-  return { token: loginRes.body.token, userId };
-};
-
-const createDoctorUserAndToken = async () => {
-  const doctorType = await ensureType('doctor');
-  const signupRes = await request(app).post('/api/v1/auth/signup').send(testData.doctorUser);
-  const { userId } = signupRes.body;
-  await User.findByIdAndUpdate(userId, { userType: doctorType._id });
-  const loginRes = await request(app).post('/api/v1/auth/login').send(testData.doctorUser);
-  return { token: loginRes.body.token, userId };
-};
-
-const buildDoctorProfilePayload = () => {
-  const start = new Date(Date.now() + 60); // +1 hour
-  const end = new Date(start.getTime() + 30); // +30 minutes
-  return {
-    shiftStartTime: start.toISOString(),
-    shiftEndTime: end.toISOString(),
-    firstName: 'John',
-    lastName: 'Doctor',
-  };
-};
+const { createStaffUserAndToken, createDoctorUserAndToken } = require('./testUtils');
+const { buildDoctorProfilePayload, getFutureDate } = require('./testUtils');
 
 describe('Doctor Routes: /api/v1/doctors', () => {
   let staffToken;
@@ -59,10 +22,10 @@ describe('Doctor Routes: /api/v1/doctors', () => {
   let doctorUserId;
 
   beforeEach(async () => {
-    const staff = await createStaffUserAndToken();
+    const staff = await createStaffUserAndToken(app);
     staffToken = staff.token;
 
-    const doctor = await createDoctorUserAndToken();
+    const doctor = await createDoctorUserAndToken(app);
     doctorToken = doctor.token;
     doctorUserId = doctor.userId;
   });
@@ -105,7 +68,7 @@ describe('Doctor Routes: /api/v1/doctors', () => {
       .set('Authorization', `Bearer ${doctorToken}`);
 
     expect(res.status).toBe(200);
-    expect(res.body.firstName).toBe(doctorPayload.firstName);
+    expect(res.body.data.firstName).toBe(doctorPayload.firstName);
   });
 
   test('PATCH /doctors/:userId - should return 400 if shiftEndTime is not after shiftStartTime', async () => {
@@ -115,9 +78,7 @@ describe('Doctor Routes: /api/v1/doctors', () => {
       .set('Authorization', `Bearer ${staffToken}`)
       .send({ ...doctorPayload, userId: doctorUserId });
 
-    const invalidShiftEnd = new Date(
-      new Date(doctorPayload.shiftStartTime).getTime() - 60
-    ).toISOString();
+    const invalidShiftEnd = getFutureDate(-60 * 60 * 1000); // 1 hour in the past
 
     const res = await request(app)
       .patch(`/api/v1/doctors/${doctorUserId}`)
