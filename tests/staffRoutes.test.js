@@ -10,29 +10,15 @@
 
 const request = require('supertest');
 const app = require('../src/index');
-const User = require('../src/models/User');
-const UserType = require('../src/models/UserTypes');
 const { testData } = require('./setupMongo');
-
-const ensureType = async (typeName) =>
-  UserType.findOneAndUpdate({ typeName }, { $setOnInsert: { typeName } }, { upsert: true, new: true });
-
-const createStaffUserAndToken = async () => {
-  const staffType = await ensureType('staff');
-  await ensureType('doctor'); // used in the userType change test
-  const signupRes = await request(app).post('/api/v1/auth/signup').send(testData.staffUser);
-  const { userId } = signupRes.body;
-  await User.findByIdAndUpdate(userId, { userType: staffType._id });
-  const loginRes = await request(app).post('/api/v1/auth/login').send(testData.staffUser);
-  return { token: loginRes.body.token, userId };
-};
+const { createStaffUserAndToken } = require('./testUtils');
 
 describe('Staff Routes: /api/v1/staff', () => {
   let staffToken;
   let staffUserId;
 
   beforeEach(async () => {
-    const staff = await createStaffUserAndToken();
+    const staff = await createStaffUserAndToken(app);
     staffToken = staff.token;
     staffUserId = staff.userId;
   });
