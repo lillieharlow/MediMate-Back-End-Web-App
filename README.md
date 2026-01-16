@@ -76,7 +76,7 @@
 ### Deployment Dependencies
 | Package | Version | License | Purpose |
 |---|---:|---|---|
-| bcryptjs | ^3.0.3 | MIT | Protecting user passwords by hashing them before storage. |
+| bcryptjs | ^3.0.3 | BSD-3-Clause | Protecting user passwords by hashing them before storage. |
 | cors | ^2.8.5 | MIT | Enabling Cross-Origin Resource Sharing to restrict access to requested resources. |
 | express | ^5.2.1 | MIT | Web framework for building RESTful APIs and handling HTTP requests. |
 | express-rate-limit | ^8.2.1 | MIT | Limiting repeated requests to API endpoints. |
@@ -104,7 +104,33 @@
 
 ## Alternative Technologies
 **TODO: List alternative technologies that could have been used for this project**
+### Deployment Dependencies
+| Package | Alternatives | Reason For Selecting Package |
+|---|---|---|
+| bcryptjs | Argon2, Scrypt, PBKDF2 | Bcrypt was selected due to its industry acceptance, balance of security and performance, and ubiquitous documentation. |
+| cors | Corser, express-cors  | CORS itself represents the industry standard for allowing resource sharing across origins. The cors NPM package is the most widely implemented package for this purpose. |
+| express | | |
+| express-rate-limit | | |
+| express-validator | | |
+| helmet | | |
+| jsonwebtoken | | |
+| mongoose | | |
+| validator | | |
 
+### Development Dependencies
+| Package | Alternatives | Reason For Selecting Package |
+|---|---|---|
+| @eslint/js |  |  |
+| eslint |  |  |
+| eslint-config-airbnb |  |  |
+| eslint-config-airbnb-base |  |  |
+| eslint-config-prettier |  |  |
+| eslint-plugin-node |  |  |
+| eslint-plugin-promise |  |  |
+| globals |  |  |
+| mongodb-memory-server |  |  |
+| prettier |  |  |
+| supertest |  |  |
 
 ## Style Guide
 This project follows the [AirBnB JavaScript Style Guide](https://github.com/airbnb/javascript) with the following alterations:
