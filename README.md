@@ -71,6 +71,19 @@
 | Staff | PATCH | /api/v1/staff/:id | Update staff account by ID | Staff |
 | Staff | PATCH | /api/v1/staff/userType/:id | Update user type by ID | Staff |
 | Staff | DELETE | /api/v1/staff/:id | Delete staff account by ID | Staff |
+| Doctors | GET | /api/v1/doctors | List all doctors | Staff |
+| Doctors | GET | /api/v1/doctors/:userId | Get one doctor | Staff, Doctor (Self) |
+| Doctors | POST | /api/v1/doctors | Create doctor profile | Staff |
+| Doctors | PATCH | /api/v1/doctors/:userId | Update doctor profile | Staff, Doctor (Self) |
+| Doctors | DELETE | /api/v1/doctors/:userId | Delete doctor profile | Staff |
+| Bookings | GET | /api/v1/bookings | List all bookings | Staff |
+| Bookings | GET | /api/v1/bookings/patients/:userId | Get all bookings for one patient | Staff, Doctor (Self), Patient (Self) |
+| Bookings | GET | /api/v1/bookings/doctors/:userId | Get all bookings for one doctor | Staff, Doctor (Self) |
+| Bookings | GET | /api/v1/bookings/:bookingId | Get one booking | Staff, Doctor (Self), Patient (Self) |
+| Bookings | POST | /api/v1/bookings | Create a booking | Staff, Patient |
+| Bookings | PATCH | /api/v1/bookings/:bookingId | Update a booking | Staff, Doctor (Self), Patient (Self) |
+| Bookings | PATCH | /api/v1/bookings/:bookingId/doctorNotes | Update doctor notes of a booking | Doctor (Self) |
+| Bookings | DELETE | /api/v1/bookings/:bookingId | Delete a booking | Staff, Patient (Self) |
 
 ## Dependencies
 ### Deployment Dependencies
@@ -111,29 +124,6 @@ This project follows the [AirBnB JavaScript Style Guide](https://github.com/airb
 #### Alterations:
 * Dangling underscores are allowed for MongoDB default ID field `_id`
 
-
-## API Endpoints
-# Public
-* GET homepage - /api/v1/
-
-# Auth
-* POST register - /api/v1/auth/register
-* POST login - /api/v1/auth/login
-
-# Patients
-* POST - Create patient profile (patient only) - /api/v1/patients
-* GET - Get patient by userId (Staff all, patients self, doctors with bookings for that patient) - /api/v1/patients/:userId 
-* PATCH - Update patient profile (staff & patient only) - /api/v1/patients/:userId 
-* DELETE - Delete patient (staff only) - /api/v1/patients/:userId
-
-# Staff
-* PATCH - Change user type (staff only) - /api/v1/staff/userType/:userId
-* POST - Create staff profile (staff only) - /api/v1/staff
-* GET - Get staff by userId (staff only) - /api/v1/staff/:userId  
-* GET - List all staff (staff only) - /api/v1/staff
-* GET - List all patients (staff only) - /api/v1/staff/patients
-* PATCH - Update staff profile (staff only) - /api/v1/staff/:userId
-* DELETE - Delete staff (staff only) - /api/v1/staff/:userId  
 
 ## Reference List
 Express-validator. (2025) *express-validator*, https://express-validator.github.io/docs, accessed: 5 January 2025.
