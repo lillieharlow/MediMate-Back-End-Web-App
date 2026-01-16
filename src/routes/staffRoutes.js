@@ -31,6 +31,7 @@ const router = express.Router();
 router.patch(
   '/userType/:userId',
   jwtAuth,
+  authorizeUserTypes('staff'),
   asyncHandler(async (request, response) => {
     const { userId } = request.params;
     const { typeName } = request.body;

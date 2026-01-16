@@ -31,11 +31,20 @@ router.get(
   authorizeUserTypes('staff'),
   asyncHandler(async (request, response) => {
     const bookings = await Bookings.find({});
-
+    const requester = await User.findById(request.user.userId).populate('userType');
+    const requesterType = requester.userType.typeName;
+    let filtered = bookings;
+    if (requesterType !== 'doctor') {
+      filtered = bookings.map((b) => {
+        const obj = b.toObject();
+        delete obj.doctorNotes;
+        return obj;
+      });
+    }
     response.status(200).json({
       success: true,
-      count: bookings.length,
-      data: bookings,
+      count: filtered.length,
+      data: filtered,
     });
   })
 );
@@ -56,10 +65,18 @@ router.get(
     }
 
     const bookings = await Bookings.find({ patientId: userId });
+    let filtered = bookings;
+    if (requesterType !== 'doctor') {
+      filtered = bookings.map((b) => {
+        const obj = b.toObject();
+        delete obj.doctorNotes;
+        return obj;
+      });
+    }
     response.status(200).json({
       success: true,
-      count: bookings.length,
-      data: bookings,
+      count: filtered.length,
+      data: filtered,
     });
   })
 );
@@ -80,10 +97,18 @@ router.get(
     }
 
     const bookings = await Bookings.find({ doctorId: userId });
+    let filtered = bookings;
+    if (requesterType !== 'doctor') {
+      filtered = bookings.map((b) => {
+        const obj = b.toObject();
+        delete obj.doctorNotes;
+        return obj;
+      });
+    }
     response.status(200).json({
       success: true,
-      count: bookings.length,
-      data: bookings,
+      count: filtered.length,
+      data: filtered,
     });
   })
 );
@@ -111,9 +136,14 @@ router.get(
       throw createError('You do not have permission to access this booking', 403);
     }
 
+    let filtered = booking;
+    if (requesterType !== 'doctor') {
+      filtered = booking.toObject();
+      delete filtered.doctorNotes;
+    }
     response.status(200).json({
       success: true,
-      data: booking,
+      data: filtered,
     });
   })
 );
@@ -127,6 +157,31 @@ router.post(
   asyncHandler(async (request, response) => {
     const { patientId, doctorId, bookingStatus, datetimeStart, bookingDuration, patientNotes } =
       request.body;
+
+    // Overlap check: Prevent doctor from having overlapping bookings
+    const start = new Date(datetimeStart);
+    const end = new Date(start.getTime() + bookingDuration * 60000);
+    const overlap = await Bookings.findOne({
+      doctorId,
+      $or: [
+        {
+          datetimeStart: { $lt: end },
+          $expr: {
+            $gte: [{ $add: ['$datetimeStart', { $multiply: ['$bookingDuration', 60000] }] }, start],
+          },
+        },
+        {
+          datetimeStart: { $gte: start, $lt: end },
+        },
+      ],
+    });
+    if (overlap) {
+      throw createError(
+        'There are no available appointments at this time with your choosen Doctor.',
+        409
+      );
+    }
+
     const booking = await Bookings.create({
       patientId,
       doctorId,
@@ -134,7 +189,7 @@ router.post(
       datetimeStart,
       bookingDuration,
       patientNotes,
-      doctorNotes: null, // Only doctors can add notes to this field once booking is created
+      doctorNotes: null, // Only doctors can read & update this field once booking is created
     });
     response.status(201).json({
       success: true,
