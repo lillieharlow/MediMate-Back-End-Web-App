@@ -1,10 +1,9 @@
 const mongoose = require('mongoose');
 const app = require('./index.js');
-const seedDatabase = require('./utils/seedDatabase');
+const { seedDatabase } = require('./utils/seedDatabase');
 
-// eslint-disable-next-line no-undef
+// eslint-disable no-undef
 const PORT = process.env.PORT || 3000;
-// eslint-disable-next-line no-undef
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/medimate';
 
 const startServer = async () => {

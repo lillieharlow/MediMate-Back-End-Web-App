@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /**
  * Doctor User Profile Model: Handles doctor profile data
  * Defines doctor profile schema with:
@@ -23,12 +24,6 @@ const DoctorProfileSchema = mongoose.Schema(
     shiftEndTime: {
       type: Date,
       required: [true, 'Shift end time is required'],
-      validate: {
-        validator(value) {
-          return value > this.shiftStartTime;
-        },
-        message: 'Shift end time must be after shift start time',
-      },
     },
     firstName: {
       type: String,

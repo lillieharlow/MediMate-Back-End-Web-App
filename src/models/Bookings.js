@@ -61,4 +61,7 @@ const BookingsSchema = mongoose.Schema(
   { timestamps: true }
 );
 
+// Prevent a doctor from having two bookings at the same start time
+BookingsSchema.index({ doctorId: 1, datetimeStart: 1 }, { unique: true });
+
 module.exports = mongoose.model('Bookings', BookingsSchema);
