@@ -1,5 +1,5 @@
-# MediMate-Back-End-Web-Application
-**TODO: Add project description here**
+# MediMate — Back-End Web Application ⚕️
+A clean, minimal back-end API for MediMate — a medical appointment booking system built with Node.js, Express and MongoDB.
 
 ## Contents
 - [Hardware Requirements](#hardware-requirements)
@@ -9,48 +9,65 @@
 - [Dependencies](#dependencies)
     - [Deployment Dependencies](#deployment-dependencies)
     - [Development Dependencies](#development-dependencies)
-- [Purpose of Chosen Technologies](#purpose-of-chosen-technologies)
 - [Alternative Technologies](#alternative-technologies)
-- [Licensing of Technologies](#licensing-of-technologies)
 - [Style Guide](#style-guide)
 - [Reference List](#reference-list)
 
+---
+
 ## Hardware Requirements
-- **Processor:** Minimum: 1GHz or faster 64-bit processor  
-- **RAM:** Minimum: 1 GB
-- **Storage:** Minimum: 1 GB free HDD or SSD space
-- **Network:** Required: Internet access required
-- **OS:** Minimum: Windows 10 / Server 2016, macOS 13.5, Linux Kernel 4.18
+- ✅ Processor: 1 GHz or faster 64‑bit CPU  
+- ✅ RAM: 1 GB minimum  
+- ✅ Storage: 1 GB free HDD/SSD  
+- ✅ Network: Internet access  
+- ✅ OS: Windows 10 / Server 2016, macOS 13.5, Linux Kernel 4.18+
+
+---
 
 ## Installation
-1. Install Node.js
-    - Recommended: Use Node Version Manager (NVM) on Linux/MacOS systems:  
-        1.  ```bash
-            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
-            ```  
-        2.  ```bash
-            nvm install --lts
-            ```
-    - For windows systems, download and install from the [official Node.js website](https://nodejs.org/en/download/) (Recommend WSL for NVM functionality)
+1. Install Node.js (recommend NVM on Linux/macOS)
+     ```bash
+     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+     nvm install --lts
+     ```
+     For Windows, use the official installer (WSL recommended for NVM).
 
-2. Install [MongoDB](https://www.mongodb.com/try/download/community), or configure a cloud-hosted MongoDB service such as [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+2. Install MongoDB or use MongoDB Atlas: https://www.mongodb.com/try/download/community
 
-3. Clone the repository:
-    ```bash
-    git clone git@github.com:lillieharlow/MediMate-Back-End-Web-App.git
-    ```
+3. Clone the repo:
+     ```bash
+     git clone git@github.com:lillieharlow/MediMate-Back-End-Web-App.git
+     cd MediMate-Back-End-Web-App
+     ```
 
 4. Install dependencies:
-    ```bash
-    npm install
-    ```
+     ```bash
+     npm install
+     ```
 
-5. Configure environment variables:
-    - Copy the `.env.example` file to `.env`
-    - Update environment variables with your configuration
+5. Configure environment:
+     ```bash
+     cp .env.example .env
+     # Edit .env with your config
+     ```
+
+---
 
 ## Usage
-**TODO: list usage instructions**
+### Production Environment
+```bash
+npm start
+```
+### Development Environment
+```bash
+npm run dev
+```
+### Running Tests
+```bash
+npm test
+```
+
+---
 
 ## Endpoints
 | Category | Method | Endpoint | Purpose | User Access |
@@ -86,10 +103,11 @@
 | Bookings | DELETE | /api/v1/bookings/:bookingId | Delete a booking | Staff, Patient (Self) |
 
 ## Dependencies
+
 ### Deployment Dependencies
 | Package | Version | License | Purpose |
 |---|---:|---|---|
-| bcryptjs | ^3.0.3 | MIT | Protecting user passwords by hashing them before storage. |
+| bcryptjs | ^3.0.3 | BSD-3-Clause | Protecting user passwords by hashing them before storage. |
 | cors | ^2.8.5 | MIT | Enabling Cross-Origin Resource Sharing to restrict access to requested resources. |
 | express | ^5.2.1 | MIT | Web framework for building RESTful APIs and handling HTTP requests. |
 | express-rate-limit | ^8.2.1 | MIT | Limiting repeated requests to API endpoints. |
@@ -114,16 +132,41 @@
 | prettier | ^3.7.4 | MIT | Code formatter to ensure consistent code style. |
 | supertest | ^7.2.2 | MIT | HTTP assertions for testing Node.js HTTP servers. |
 
+---
 
 ## Alternative Technologies
 **TODO: List alternative technologies that could have been used for this project**
+### Deployment Dependencies
+| Package | Alternatives | Reason For Selecting Package |
+|---|---|---|
+| bcryptjs | Argon2, Scrypt, PBKDF2 | Bcrypt was selected due to its industry acceptance, balance of security and performance, and ubiquitous documentation. |
+| cors | Corser, express-cors  | CORS itself represents the industry standard for allowing resource sharing across origins. The cors NPM package is the most widely implemented package for this purpose. |
+| express | Fastify, Koa | With ~57M weekly downloads, express is the largest web framework for Node.js, and therefore has the widest availability of community support & plugins. Fastify & Koa are both newer frameworks with more specialised use cases, which were not necessary for this app. |
+| express-rate-limit | rate-limiter-flexible | Rate-limiter-flexible offers more advanced rate limiting features for wider use cases and integration into data storage solutions, however this app requires basic rate limiting functionality at the API level, and as such the express-rate-limit package was sufficient. |
+| express-validator | joi | Express-validator was selected for its ease of integration with Express, while still offering sufficient validation capabilities for this use case. Joi provides more comprehensive validation and is more widely adopted, but not required for this app. |
+| helmet | hsts | Helmet is widely adopted by the community for setting common HTTP security headers. While other packages performing similar functions are available, they target more specific security features or headers, while Helmet provides a comprehensive simple to implement solution. |
+| jsonwebtoken | express-jwt, jose | jsonwebtoken is used to create & verify JWTs in the app. Express-jwt provides specific middleware for express, and is itself dependent on jsonwebtoken, so jsonwebtoken is used for flexibility of implementation into the app. Jose provides a more comprehensive solution with additional features, however these features are not required in this use case. |
+| mongoose | prisma, sequalize | Mongoose was selected for its specialisation with MongoDB, and ease of integration with express. Prisma and Sequelize are more general ORM tools that support multiple databases, but were not necessary for this app. |
 
+### Development Dependencies
+| Package | Alternatives | Reason For Selecting Package |
+|---|---|---|
+| eslint | biome, oxlint | Eslint is the most feature-rich and widely adopted JavaScript linter, providing extensive rules and community support, and integration with the AirBnB style guide, which was selected for this project. |
+| eslint-config-airbnb | Google, Standard | The AirBnB style guide was chosen due to its wide acceptance in the community, and ease of integration into linters & formatters. |
+| eslint-config-prettier | Eslint configuration | eslint-config-prettier disables eslint rules that may conflict with the code formatter used in this project, prettier. An alternative would be direct modification of eslint rules to accommodate prettier formatting, which would add unnecessary workload. |
+| eslint-plugin-node | N/A | Adds additional ESLint rules specific to the Node.js environment.  |
+| eslint-plugin-promise | N/A | Adds additional ESLint rules for improved handling of promises. |
+| globals | N/A | Configures global variables for ESLint to recognize, preventing false positives for undefined variables. |
+| jest | mocha, chai | Jest offers a comprehensive framework for writing tests, and is widely adopted in the community. While alternatives are just as capable, familiarity with Jest was a deciding factor for this project. |
+| mongodb-memory-server | Environment configuration | Provides an in-memory MongoDB server for testing, without requiring configuration of development environment handling in database configuration. |
+| prettier | biome, beautify | Prettier is a widely adopted code formatter, with extensive community support and integration options, particularly with ESLint and IDEs. It was chosen for its simple setup and linter integration. |
+| supertest | nock | Supertest provides HTTP server mocking for Node.js implementations. It was chosen for its simplicity of integration with Express, and community recognition. |
 
 ## Style Guide
-This project follows the [AirBnB JavaScript Style Guide](https://github.com/airbnb/javascript) with the following alterations:
-#### Alterations:
-* Dangling underscores are allowed for MongoDB default ID field `_id`
+This project follows the AirBnB JavaScript Style Guide with one alteration:
+- Allow dangling underscore for MongoDB `_id`.
 
+---
 
 ## Reference List
 Express-validator. (2025) *express-validator*, https://express-validator.github.io/docs, accessed: 5 January 2025.
