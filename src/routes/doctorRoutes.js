@@ -2,7 +2,7 @@
  * Doctor Routes: Doctor profile CRUD endpoints
  *
  * Handles HTTP endpoints for doctor profiles:
- * - GET /api/v1/doctors                : List all doctors (staff only)
+ * - GET /api/v1/doctors                : List all doctors (staff and patient only)
  * - GET /api/v1/doctors/:userId        : Get one doctor (staff; doctor can view self)
  * - POST /api/v1/doctors               : Create doctor profile (staff only)
  * - PATCH /api/v1/doctors/:userId      : Update doctor (staff; doctor can update self)
@@ -23,11 +23,11 @@ const User = require('../models/User');
 const router = express.Router();
 
 // ========== GET /api/v1/doctors — List all doctors ==========
-// Authorized: Staff only
+// Authorized: Staff and patient only
 router.get(
   '/',
   jwtAuth,
-  authorizeUserTypes('staff'),
+  authorizeUserTypes('staff', 'patient'),
   asyncHandler(async (request, response) => {
     const doctors = await profileController.getAllProfiles(DoctorProfile);
 
