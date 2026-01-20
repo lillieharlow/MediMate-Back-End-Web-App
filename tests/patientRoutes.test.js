@@ -37,7 +37,18 @@ describe('Patient Routes: CRUD operations for /api/v1/patients', () => {
     expect(res.status).toBe(201);
     expect(res.body.success).toBe(true);
     expect(res.body.userId).toBe(userId);
+
+    const resDuplicate = await request(app)
+      .post('/api/v1/patients')
+      .set('Authorization', `Bearer ${token}`)
+      .send(testData.validPatient);
+
+    expect(resDuplicate.status).toBe(409);
   });
+
+  test('POST /patients with a duplicate profile should be prevented', async () => {
+    
+  })
 
   test('GET /patients/:userId - should only get own patient profile', async () => {
     await request(app)
