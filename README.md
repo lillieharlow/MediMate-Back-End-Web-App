@@ -84,6 +84,7 @@ npm test
 | Staff | GET | /api/v1/staff/ | Get all staff accounts | Staff |
 | Staff | GET | /api/v1/staff/:id | Get staff account by ID | Staff |
 | Staff | GET | /api/v1/staff/patients | Get all patient accounts | Staff |
+| Staff | GET | /api/v1/staff/users | Get all user accounts of any type | Staff |
 | Staff | POST | /api/v1/staff/ | Create new staff account | Staff |
 | Staff | PATCH | /api/v1/staff/:id | Update staff account by ID | Staff |
 | Staff | PATCH | /api/v1/staff/userType/:id | Update user type by ID | Staff |
