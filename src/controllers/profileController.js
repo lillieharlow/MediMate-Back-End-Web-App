@@ -22,7 +22,7 @@ function validateDoctorShiftTimes(shiftStartTime, shiftEndTime) {
 
 // ========== Create Profile ==========
 const createProfile = async (Model, userId, profileData) => {
-  const existingProfile = await Model.findById(userId);
+  const existingProfile = await Model.findOne({user: userId});
   if (existingProfile) {
     throw createError('Profile already exists', 409);
   }
@@ -30,7 +30,7 @@ const createProfile = async (Model, userId, profileData) => {
     validateDoctorShiftTimes(profileData.shiftStartTime, profileData.shiftEndTime);
   }
   const profile = new Model({
-    _id: userId,
+    user: userId,
     ...profileData,
   });
   await profile.save();
@@ -39,7 +39,10 @@ const createProfile = async (Model, userId, profileData) => {
 
 // ========== Get Profile By ID ==========
 const getProfileById = async (Model, userId) => {
-  const profile = await Model.findById(userId);
+  const profile = await Model.findOne({ user: userId }).populate({
+    path: 'user',
+    populate: { path: 'userType' },
+  });
 
   if (!profile) {
     throw createError('Profile not found', 404);
@@ -50,19 +53,19 @@ const getProfileById = async (Model, userId) => {
 
 // ========== Get All Profiles ==========
 const getAllProfiles = async (Model) => {
-  const profiles = await Model.find();
+  const profiles = await Model.find().populate({ path: 'user', populate: { path: 'userType' } });
   return profiles;
 };
 
 // ========== Update Profile ==========
 const updateProfile = async (Model, userId, updateData) => {
   if (Model.modelName === 'DoctorProfile') {
-    const current = await Model.findById(userId);
+    const current = await Model.findOne({ user: userId });
     const start = updateData.shiftStartTime || (current && current.shiftStartTime);
     const end = updateData.shiftEndTime || (current && current.shiftEndTime);
     validateDoctorShiftTimes(start, end);
   }
-  const updated = await Model.findByIdAndUpdate(userId, updateData, {
+  const updated = await Model.findOneAndUpdate({ user: userId }, updateData, {
     new: true,
     runValidators: true,
   });
@@ -74,7 +77,7 @@ const updateProfile = async (Model, userId, updateData) => {
 
 // ========== Delete Profile ==========
 const deleteProfile = async (Model, userId) => {
-  const deleted = await Model.findByIdAndDelete(userId);
+  const deleted = await Model.findOneAndDelete({ user: userId });
 
   if (!deleted) {
     throw createError('Profile not found', 404);

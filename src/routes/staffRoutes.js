@@ -81,7 +81,7 @@ router.post(
     response.status(201).json({
       success: true,
       message: 'Staff profile created successfully',
-      userId: staff._id,
+      userId: staff.user._id,
     });
   })
 );
