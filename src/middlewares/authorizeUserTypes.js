@@ -23,7 +23,6 @@ const authorizeUserTypes =
       if (!allowedTypes.includes(userTypeName)) {
         throw createError('You do not have permission to access this resource', 403);
       }
-
       next();
     } catch (error) {
       next(error);
