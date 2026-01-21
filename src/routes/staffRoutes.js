@@ -128,7 +128,24 @@ router.get(
   jwtAuth,
   authorizeUserTypes('staff'),
   asyncHandler(async (request, response) => {
-    const patients = await PatientProfile.find();
+    const filter = {};
+    if (request.query.firstName) {
+      filter.firstName = { $regex: request.query.firstName, $options: 'i' };
+    }
+    if (request.query.lastName) {
+      filter.lastName = { $regex: request.query.lastName, $options: 'i' };
+    }
+    if (request.query.email) {
+      filter.email = { $regex: request.query.email, $options: 'i' };
+    }
+    if (request.query.dateOfBirth) {
+      filter.dob = request.query.dateOfBirth;
+    }
+    if (request.query.phone) {
+      filter.phone = { $regex: request.query.phone, $options: 'i' };
+    }
+
+    const patients = await PatientProfile.find(filter);
 
     response.status(200).json({
       success: true,
