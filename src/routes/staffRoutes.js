@@ -2,11 +2,11 @@
  * Staff Routes: Staff profile and management endpoints
  *
  * Handles HTTP endpoints for staff profiles:
+ * - GET /api/v1/staff/patients                 : List all patients (staff only)
  * - PATCH /api/v1/staff/userType/:userId       : Change user type (staff only)
  * - POST /api/v1/staff                         : Create staff profile (staff only)
  * - GET /api/v1/staff/:userId                  : Get staff by userId (staff only)
  * - GET /api/v1/staff                          : List all staff (staff only)
- * - GET /api/v1/staff/patients                 : List all patients (staff only)
  * - PATCH /api/v1/staff/:userId                : Update staff profile (staff only)
  * - DELETE /api/v1/staff/:userId               : Delete staff (staff only)
  */
@@ -25,6 +25,40 @@ const UserType = require('../models/UserTypes');
 const createError = require('../utils/httpError');
 
 const router = express.Router();
+
+// ========== GET /api/v1/staff/patients — List all patients ==========
+// Authorized: Staff only
+router.get(
+  '/patients',
+  jwtAuth,
+  authorizeUserTypes('staff'),
+  asyncHandler(async (request, response) => {
+    const filter = {};
+    if (request.query.firstName) {
+      filter.firstName = { $regex: request.query.firstName, $options: 'i' };
+    }
+    if (request.query.lastName) {
+      filter.lastName = { $regex: request.query.lastName, $options: 'i' };
+    }
+    if (request.query.email) {
+      filter.email = { $regex: request.query.email, $options: 'i' };
+    }
+    if (request.query.dateOfBirth) {
+      filter.dateOfBirth = request.query.dateOfBirth;
+    }
+    if (request.query.phone) {
+      filter.phone = { $regex: request.query.phone, $options: 'i' };
+    }
+
+    const patients = await PatientProfile.find(filter);
+
+    response.status(200).json({
+      success: true,
+      count: patients.length,
+      data: patients,
+    });
+  })
+);
 
 // ========== PATCH /api/v1/staff/userType/:userId — Change user type ==========
 // Authorized: Staff only
@@ -117,40 +151,6 @@ router.get(
       success: true,
       count: staff.length,
       data: staff,
-    });
-  })
-);
-
-// ========== GET /api/v1/staff/patients — List all patients ==========
-// Authorized: Staff only
-router.get(
-  '/patients',
-  jwtAuth,
-  authorizeUserTypes('staff'),
-  asyncHandler(async (request, response) => {
-    const filter = {};
-    if (request.query.firstName) {
-      filter.firstName = { $regex: request.query.firstName, $options: 'i' };
-    }
-    if (request.query.lastName) {
-      filter.lastName = { $regex: request.query.lastName, $options: 'i' };
-    }
-    if (request.query.email) {
-      filter.email = { $regex: request.query.email, $options: 'i' };
-    }
-    if (request.query.dateOfBirth) {
-      filter.dob = request.query.dateOfBirth;
-    }
-    if (request.query.phone) {
-      filter.phone = { $regex: request.query.phone, $options: 'i' };
-    }
-
-    const patients = await PatientProfile.find(filter);
-
-    response.status(200).json({
-      success: true,
-      count: patients.length,
-      data: patients,
     });
   })
 );
