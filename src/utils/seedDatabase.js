@@ -47,8 +47,6 @@ const seedStaffUser = async () => {
     firstName: `Default`,
     lastName: `StaffMember`,
   });
-
-  console.log(`Created staff user: ${staffEmail} | Password: ${staffPassword}`);
 };
 
 // ========== Seed Doctors ==========
@@ -95,14 +93,14 @@ async function seedPatients(count) {
           userType: patientType._id,
         });
         user.save();
-        await PatientProfile.create({
-          user: user._id,
-          firstName: `Pat${idx}`,
-          lastName: `McPatient${idx}`,
-          dateOfBirth: new Date(1990, idx, idx),
-          email,
-          phone: `+1415555267${idx}`,
-        });
+            await PatientProfile.create({
+              user: user._id,
+              firstName: `Pat${idx}`,
+              lastName: `McPatient${idx}`,
+              dateOfBirth: `${String(idx).padStart(2, '0')}/${String(idx).padStart(2, '0')}/1990`,
+              email,
+              phone: `1415555267${idx}`,
+            });
       }
       return user._id;
     })
@@ -133,6 +131,7 @@ async function seedBookings(doctorIds, patientIds, count) {
       });
     })
   );
+  console.log('Finished seeding bookings.');
 }
 
 // ========== Main Seed Function ==========

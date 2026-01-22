@@ -42,9 +42,6 @@ router.get(
     if (request.query.lastName) {
       filter.lastName = { $regex: request.query.lastName, $options: 'i' };
     }
-    if (request.query.email) {
-      filter.email = { $regex: request.query.email, $options: 'i' };
-    }
     if (request.query.dateOfBirth) {
       filter.dateOfBirth = request.query.dateOfBirth;
     }
@@ -52,12 +49,20 @@ router.get(
       filter.phone = { $regex: request.query.phone, $options: 'i' };
     }
 
-    const patients = await PatientProfile.find(filter);
+    let patients = await PatientProfile.find(filter).populate('user');
+
+    if (request.query.email) {
+      const emailRegex = new RegExp(request.query.email, 'i');
+      patients = patients.filter((p) => p.user && emailRegex.test(p.user.email));
+    }
 
     response.status(200).json({
       success: true,
       count: patients.length,
-      data: patients,
+      data: patients.map((p) => ({
+        ...p.toObject(),
+        email: p.user?.email || null,
+      })),
     });
   })
 );
