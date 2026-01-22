@@ -5,8 +5,9 @@
  * - GET /api/v1/staff/patients                 : List all patients (staff only)
  * - PATCH /api/v1/staff/userType/:userId       : Change user type (staff only)
  * - POST /api/v1/staff                         : Create staff profile (staff only)
- * - GET /api/v1/staff/:userId                  : Get staff by userId (staff only)
  * - GET /api/v1/staff                          : List all staff (staff only)
+ * - GET /api/v1/staff/users                    : List all profiles of any user type (staff only)
+ * - GET /api/v1/staff/:userId                  : Get staff by userId (staff only)
  * - PATCH /api/v1/staff/:userId                : Update staff profile (staff only)
  * - DELETE /api/v1/staff/:userId               : Delete staff (staff only)
  */
@@ -138,23 +139,6 @@ router.get(
   })
 );
 
-// ========== GET /api/v1/staff/patients — List all patients ==========
-// Authorized: Staff only
-router.get(
-  '/patients',
-  jwtAuth,
-  authorizeUserTypes('staff'),
-  asyncHandler(async (request, response) => {
-    const patients = await profileController.getAllProfiles(PatientProfile);
-
-    response.status(200).json({
-      success: true,
-      count: patients.length,
-      data: patients,
-    });
-  })
-);
-
 // ========== GET /api/v1/staff/users — List profiles of all user types ==========
 // Authorized: Staff only
 router.get(
@@ -170,6 +154,32 @@ router.get(
       success: true,
       count: patients.length + doctors.length + staff.length,
       data: [...patients, ...doctors, ...staff],
+    });
+  })
+);
+
+// ========== GET /api/v1/staff/:userId — Get staff by userId ==========
+// Authorized: Staff only
+router.get(
+  '/:userId',
+  jwtAuth,
+  authorizeUserTypes('staff'),
+  asyncHandler(async (request, response) => {
+    const { userId } = request.params;
+    const requestingUserId = request.user.userId;
+
+    const requestingUser = await User.findById(requestingUserId).populate('userType');
+    const userTypeName = requestingUser.userType.typeName;
+
+    if (userTypeName !== 'staff') {
+      throw createError('You do not have permission to access this profile', 403);
+    }
+
+    const staff = await profileController.getProfileById(StaffProfile, userId);
+
+    response.status(200).json({
+      success: true,
+      data: staff,
     });
   })
 );

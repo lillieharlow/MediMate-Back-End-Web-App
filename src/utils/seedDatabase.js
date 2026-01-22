@@ -13,6 +13,7 @@ const UserType = require('../models/UserTypes');
 const DoctorProfile = require('../models/DoctorProfile');
 const PatientProfile = require('../models/PatientProfile');
 const Bookings = require('../models/Bookings');
+const StaffProfile = require('../models/StaffProfile');
 
 // ========== Seed User Types ==========
 const seedUserTypes = async () => {
@@ -36,10 +37,15 @@ const seedStaffUser = async () => {
   const staffType = await UserType.findOne({ typeName: 'staff' });
 
   const hashedPassword = await bcrypt.hash(staffPassword, 10);
-  await User.create({
+  const user = await User.create({
     email: staffEmail,
     hashedPassword,
     userType: staffType._id,
+  });
+  await StaffProfile.create({
+    user: user._id,
+    firstName: `Default`,
+    lastName: `StaffMember`,
   });
 
   console.log(`Created staff user: ${staffEmail} | Password: ${staffPassword}`);
@@ -59,8 +65,9 @@ async function seedDoctors(count) {
           hashedPassword: await bcrypt.hash('doctor123', 10),
           userType: doctorType._id,
         });
+        user.save();
         await DoctorProfile.create({
-          _id: user._id,
+          user: user._id,
           firstName: `Doc${idx}`,
           lastName: `McDoctor${idx}`,
           shiftStartTime: new Date(Date.now() + 3600 * 1000 * idx),
@@ -87,8 +94,9 @@ async function seedPatients(count) {
           hashedPassword: await bcrypt.hash('patient123', 10),
           userType: patientType._id,
         });
+        user.save();
         await PatientProfile.create({
-          _id: user._id,
+          user: user._id,
           firstName: `Pat${idx}`,
           lastName: `McPatient${idx}`,
           dateOfBirth: new Date(1990, idx, idx),
