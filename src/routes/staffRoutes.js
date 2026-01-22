@@ -148,17 +148,24 @@ router.get(
   jwtAuth,
   authorizeUserTypes('staff'),
   asyncHandler(async (request, response) => {
-    const { userId } = request.params;
-    const requestingUserId = request.user.userId;
-
-    const requestingUser = await User.findById(requestingUserId).populate('userType');
-    const userTypeName = requestingUser.userType.typeName;
-
-    if (userTypeName !== 'staff') {
-      throw createError('You do not have permission to access this profile', 403);
+    const filter = {};
+    if (request.query.firstName) {
+      filter.firstName = { $regex: request.query.firstName, $options: 'i' };
+    }
+    if (request.query.lastName) {
+      filter.lastName = { $regex: request.query.lastName, $options: 'i' };
+    }
+    if (request.query.email) {
+      filter.email = { $regex: request.query.email, $options: 'i' };
+    }
+    if (request.query.dateOfBirth) {
+      filter.dob = request.query.dateOfBirth;
+    }
+    if (request.query.phone) {
+      filter.phone = { $regex: request.query.phone, $options: 'i' };
     }
 
-    const staff = await profileController.getProfileById(StaffProfile, userId);
+    const patients = await PatientProfile.find(filter);
 
     response.status(200).json({
       success: true,
