@@ -13,7 +13,7 @@ const validator = require('validator');
 // ========== Patient Profile Schema ==========
 const PatientProfileSchema = mongoose.Schema(
   {
-    _id: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },

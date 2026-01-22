@@ -83,7 +83,7 @@ router.post(
     response.status(201).json({
       success: true,
       message: 'Doctor profile created successfully',
-      userId: doctor._id,
+      userId: doctor.user._id,
     });
   })
 );

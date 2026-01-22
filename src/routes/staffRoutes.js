@@ -20,6 +20,7 @@ const jwtAuth = require('../middlewares/jwtAuth');
 const validateFields = require('../middlewares/validateFields');
 const PatientProfile = require('../models/PatientProfile');
 const StaffProfile = require('../models/StaffProfile');
+const DoctorProfile = require('../models/DoctorProfile');
 const User = require('../models/User');
 const UserType = require('../models/UserTypes');
 const createError = require('../utils/httpError');
@@ -115,25 +116,7 @@ router.post(
     response.status(201).json({
       success: true,
       message: 'Staff profile created successfully',
-      userId: staff._id,
-    });
-  })
-);
-
-// ========== GET /api/v1/staff/:userId — Get staff by userId ==========
-// Authorized: Staff only
-router.get(
-  '/:userId',
-  jwtAuth,
-  authorizeUserTypes('staff'),
-  asyncHandler(async (request, response) => {
-    const { userId } = request.params;
-
-    const staff = await profileController.getProfileById(StaffProfile, userId);
-
-    response.status(200).json({
-      success: true,
-      data: staff,
+      userId: staff.user._id,
     });
   })
 );
@@ -151,6 +134,42 @@ router.get(
       success: true,
       count: staff.length,
       data: staff,
+    });
+  })
+);
+
+// ========== GET /api/v1/staff/patients — List all patients ==========
+// Authorized: Staff only
+router.get(
+  '/patients',
+  jwtAuth,
+  authorizeUserTypes('staff'),
+  asyncHandler(async (request, response) => {
+    const patients = await profileController.getAllProfiles(PatientProfile);
+
+    response.status(200).json({
+      success: true,
+      count: patients.length,
+      data: patients,
+    });
+  })
+);
+
+// ========== GET /api/v1/staff/users — List profiles of all user types ==========
+// Authorized: Staff only
+router.get(
+  '/users',
+  jwtAuth,
+  authorizeUserTypes('staff'),
+  asyncHandler(async (request, response) => {
+    const patients = await profileController.getAllProfiles(PatientProfile);
+    const doctors = await profileController.getAllProfiles(DoctorProfile);
+    const staff = await profileController.getAllProfiles(StaffProfile);
+
+    response.status(200).json({
+      success: true,
+      count: patients.length + doctors.length + staff.length,
+      data: [...patients, ...doctors, ...staff],
     });
   })
 );

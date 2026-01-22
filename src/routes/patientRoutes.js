@@ -44,7 +44,7 @@ router.post(
     response.status(201).json({
       success: true,
       message: 'Patient profile created successfully',
-      userId: patient._id,
+      userId: patient.user._id,
     });
   })
 );

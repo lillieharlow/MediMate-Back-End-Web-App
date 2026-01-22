@@ -11,7 +11,7 @@ const mongoose = require('mongoose');
 // ========== Staff Profile Schema ==========
 const StaffProfileSchema = mongoose.Schema(
   {
-    _id: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
