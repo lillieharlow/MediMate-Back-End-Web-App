@@ -32,11 +32,18 @@ const PatientProfileSchema = mongoose.Schema(
       trim: true,
     },
     dateOfBirth: {
-      type: Date,
+      type: String,
       required: [true, 'Date of birth is required'],
       validate: {
-        validator: (value) => value < new Date(),
-        message: 'Date of birth cannot be in the future',
+        validator: (value) => {
+          // Check format DD/MM/YYYY and not in the future
+          const regex = /^\d{2}\/\d{2}\/\d{4}$/;
+          if (!regex.test(value)) return false;
+          const [day, month, year] = value.split('/').map(Number);
+          const date = new Date(year, month - 1, day);
+          return date < new Date();
+        },
+        message: 'Date of birth must be in DD/MM/YYYY format and not in the future',
       },
     },
     phone: {
@@ -54,7 +61,7 @@ const PatientProfileSchema = mongoose.Schema(
     toJSON: {
       transform: (_, { dateOfBirth, createdAt, updatedAt, __v, ...rest }) => ({
         ...rest,
-        dateOfBirth: dateOfBirth ? dateOfBirth.toISOString().split('T')[0] : dateOfBirth,
+        dateOfBirth,
         createdAt,
         updatedAt,
       }),
