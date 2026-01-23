@@ -22,7 +22,7 @@ function validateDoctorShiftTimes(shiftStartTime, shiftEndTime) {
 
 // ========== Create Profile ==========
 const createProfile = async (Model, userId, profileData) => {
-  const existingProfile = await Model.findOne({user: userId});
+  const existingProfile = await Model.findOne({ user: userId });
   if (existingProfile) {
     throw createError('Profile already exists', 409);
   }
@@ -68,6 +68,9 @@ const updateProfile = async (Model, userId, updateData) => {
   const updated = await Model.findOneAndUpdate({ user: userId }, updateData, {
     new: true,
     runValidators: true,
+  }).populate({
+    path: 'user',
+    populate: { path: 'userType' },
   });
   if (!updated) {
     throw createError('Profile not found', 404);
