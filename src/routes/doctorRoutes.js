@@ -3,7 +3,7 @@
  *
  * Handles HTTP endpoints for doctor profiles:
  * - GET /api/v1/doctors                : List all doctors (staff and patient only)
- * - GET /api/v1/doctors/:userId        : Get one doctor (staff; doctor can view self)
+ * - GET /api/v1/doctors/:userId        : Get one doctor (staff; doctor can view self; patient with appointment)
  * - POST /api/v1/doctors               : Create doctor profile (staff only)
  * - PATCH /api/v1/doctors/:userId      : Update doctor (staff; doctor can update self)
  * - DELETE /api/v1/doctors/:userId     : Delete doctor profile (staff only)
@@ -40,11 +40,11 @@ router.get(
 );
 
 // ========== GET /api/v1/doctors/:userId — Get one doctor ==========
-// Authorized: Staff and doctor self
+// Authorized: Staff, doctor self, patient with appointment
 router.get(
   '/:userId',
   jwtAuth,
-  authorizeUserTypes('staff', 'doctor'),
+  authorizeUserTypes('staff', 'doctor', 'patient'),
   asyncHandler(async (request, response) => {
     const { userId } = request.params;
     const requester = await User.findById(request.user.userId).populate('userType');
