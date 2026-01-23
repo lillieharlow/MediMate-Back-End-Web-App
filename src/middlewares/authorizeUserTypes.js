@@ -15,7 +15,7 @@ const authorizeUserTypes =
       const user = await User.findById(request.user.userId).populate('userType');
 
       if (!user) {
-        throw createError('User not found', 404);
+        throw createError('User not found', 401);
       }
 
       const userTypeName = user.userType.typeName;
