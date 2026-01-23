@@ -28,7 +28,7 @@ router.get(
   '/',
   jwtAuth,
   authorizeUserTypes('staff', 'patient'),
-  asyncHandler(async (request, response) => {
+  asyncHandler(async (_request, response) => {
     const doctors = await profileController.getAllProfiles(DoctorProfile);
 
     response.status(200).json({
