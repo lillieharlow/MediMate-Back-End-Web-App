@@ -158,6 +158,11 @@ router.post(
     const { patientId, doctorId, bookingStatus, datetimeStart, bookingDuration, patientNotes } =
       request.body;
 
+    // Only allow bookings in the future
+    if (new Date(datetimeStart) < new Date()) {
+      throw createError('Bookings can only be made for a future date/time.', 400);
+    }
+
     // Overlap check: Prevent doctor from having overlapping bookings
     const start = new Date(datetimeStart);
     const end = new Date(start.getTime() + bookingDuration * 60000);
