@@ -101,6 +101,7 @@ npm test
 | Bookings | POST | /api/v1/bookings | Create a booking | Staff, Patient |
 | Bookings | PATCH | /api/v1/bookings/:bookingId | Update a booking | Staff, Doctor (Self), Patient (Self) |
 | Bookings | PATCH | /api/v1/bookings/:bookingId/doctorNotes | Update doctor notes of a booking | Doctor (Self) |
+| Bookings | GET | /api/v1/bookings/:bookingId/doctorNotes | Get doctor notes for one booking | Doctor (Self)
 | Bookings | DELETE | /api/v1/bookings/:bookingId | Delete a booking | Staff, Patient (Self) |
 
 ## Dependencies
@@ -136,7 +137,7 @@ npm test
 ---
 
 ## Alternative Technologies
-**TODO: List alternative technologies that could have been used for this project**
+
 ### Deployment Dependencies
 | Package | Alternatives | Reason For Selecting Package |
 |---|---|---|

@@ -9,6 +9,7 @@
  * - POST /api/v1/bookings                          : Create a booking (staff and patient only)
  * - PATCH /api/v1/bookings/:bookingId              : Update a booking (staff, doctor self, patient self)
  * - PATCH /api/v1/bookings/:bookingId/doctorNotes  : Update doctor notes of a booking (doctor self only)
+ * - GET /api/v1/bookings/:bookingId/doctorNotes    : Get doctor notes of a booking (doctor self only)
  * - DELETE /api/v1/bookings/:bookingId             : Delete a booking (staff and patient self)
  */
 
@@ -254,7 +255,6 @@ router.patch(
   authorizeUserTypes('doctor'),
   asyncHandler(async (request, response) => {
     const { bookingId } = request.params;
-    const { doctorNotes } = request.body;
     const requester = await User.findById(request.user.userId).populate('userType');
     const requesterType = requester.userType.typeName;
     const booking = await Bookings.findById(bookingId);
@@ -267,12 +267,43 @@ router.patch(
       throw createError('You do not have permission to update doctor notes for this booking', 403);
     }
 
-    booking.doctorNotes = doctorNotes;
+    booking.doctorNotes = request.body.doctorNotes;
     await booking.save();
 
     response.status(200).json({
       success: true,
-      data: booking,
+      data: {
+        doctorNotes: booking.doctorNotes,
+      },
+    });
+  })
+);
+
+// ========== GET /api/v1/bookings/:bookingId/doctorNotes — Get doctor notes of a booking ==========
+// Authorized: Doctor self only
+router.get(
+  '/:bookingId/doctorNotes',
+  jwtAuth,
+  authorizeUserTypes('doctor'),
+  asyncHandler(async (request, response) => {
+    const { bookingId } = request.params;
+    const requester = await User.findById(request.user.userId).populate('userType');
+    const requesterType = requester.userType.typeName;
+    const booking = await Bookings.findById(bookingId);
+
+    if (!booking) {
+      throw createError('Booking not found', 404);
+    }
+
+    if (requesterType !== 'doctor' && booking.doctorId.toString() !== requester.id) {
+      throw createError('You do not have permission to access doctor notes for this booking', 403);
+    }
+
+    response.status(200).json({
+      success: true,
+      data: {
+        doctorNotes: booking.doctorNotes,
+      },
     });
   })
 );
