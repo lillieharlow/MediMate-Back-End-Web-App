@@ -97,7 +97,7 @@ async function seedPatients(count) {
               user: user._id,
               firstName: `Pat${idx}`,
               lastName: `McPatient${idx}`,
-              dateOfBirth: `${String(idx).padStart(2, '0')}/${String(idx).padStart(2, '0')}/1990`,
+              dateOfBirth: `1990-${String(idx).padStart(2, '0')}-${String(idx).padStart(2, '0')}`,
               email,
               phone: `1415555267${idx}`,
             });
