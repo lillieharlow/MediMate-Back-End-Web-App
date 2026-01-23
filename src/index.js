@@ -51,7 +51,7 @@ app.use(express.json());
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 1000,
+  max: 500,
   message: { message: 'Too many requests from this IP' },
 });
 
@@ -70,7 +70,7 @@ const mountRoutes = () => {
 mountRoutes();
 
 // ========== GET / — API Welcome Message (Public) ==========
-app.get('/', (request, response) => {
+app.get('/', (_request, response) => {
   response.status(200).json({
     success: true,
     message: 'Hello from MediMate!',
@@ -79,7 +79,7 @@ app.get('/', (request, response) => {
 });
 
 // ========== GET /databaseHealth — Database Status (Public) ==========
-app.get('/databaseHealth', (request, response) => {
+app.get('/databaseHealth', (_request, response) => {
   response.status(200).json({
     success: true,
     models: mongoose.connection.modelNames(),

@@ -165,6 +165,11 @@ router.post(
 
     // Overlap check: Prevent doctor from having overlapping bookings
     const start = new Date(datetimeStart);
+    if (start < new Date()) {
+      throw createError('Cannot create a booking in the past.', 400);
+    }
+
+    // Overlap check: Prevent doctor from having overlapping bookings
     const end = new Date(start.getTime() + bookingDuration * 60000);
     const overlap = await Bookings.findOne({
       doctorId,

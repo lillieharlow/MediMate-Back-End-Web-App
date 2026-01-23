@@ -123,11 +123,10 @@ async function seedBookings(doctorIds, patientIds, count) {
         patientId,
         doctorId,
         bookingStatus: 'confirmed',
-        datetimeStart: start,
-        datetimeEnd: end,
+          datetimeStart: start,
+          datetimeEnd: end,
         bookingDuration: 30,
         patientNotes: `Booking ${idx} notes`,
-        doctorNotes: `Doctor notes for booking ${idx}`,
       });
     })
   );
@@ -143,8 +142,11 @@ const seedDatabase = async () => {
   await seedStaffUser();
   const doctorIds = await seedDoctors(4);
   const patientIds = await seedPatients(6);
-  await seedBookings(doctorIds, patientIds, 10);
+  await seedBookings(doctorIds, patientIds, 20);
   console.log('Database seeded successfully!');
 };
 
-module.exports = seedDatabase;
+module.exports = {
+  seedDatabase,
+  seedUserTypes,
+};
