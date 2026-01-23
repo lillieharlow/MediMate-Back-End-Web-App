@@ -90,7 +90,7 @@ npm test
 | Staff | PATCH | /api/v1/staff/userType/:id | Update user type by ID | Staff |
 | Staff | DELETE | /api/v1/staff/:id | Delete staff account by ID | Staff |
 | Doctors | GET | /api/v1/doctors | List all doctors | Staff, Patient |
-| Doctors | GET | /api/v1/doctors/:userId | Get one doctor | Staff, Doctor (Self) |
+| Doctors | GET | /api/v1/doctors/:userId | Get one doctor | Staff, Doctor (Self), Patient (booking) |
 | Doctors | POST | /api/v1/doctors | Create doctor profile | Staff |
 | Doctors | PATCH | /api/v1/doctors/:userId | Update doctor profile | Staff, Doctor (Self) |
 | Doctors | DELETE | /api/v1/doctors/:userId | Delete doctor profile | Staff |
