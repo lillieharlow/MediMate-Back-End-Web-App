@@ -115,9 +115,9 @@ async function seedBookings(doctorIds, patientIds, count) {
       const idx = i + 1;
       const doctorId = doctorIds[idx % doctorIds.length];
       const patientId = patientIds[idx % patientIds.length];
-      // Set booking times to today
-      const now = new Date();
-      const start = new Date(now.getTime() + idx * 3600 * 1000); // idx hours from now
+      const today = new Date();
+      today.setHours(7, 0, 0, 0);
+      const start = new Date(today.getTime() + (idx - 1) * 3600 * 1000); // idx booking, each 1 hour apart
       const end = new Date(start.getTime() + 30 * 60000); // 30 min duration
       await Bookings.create({
         patientId,

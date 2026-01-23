@@ -36,10 +36,6 @@ const BookingsSchema = mongoose.Schema(
     datetimeStart: {
       type: Date,
       required: [true, 'Start datetime is required'],
-      validate: {
-        validator: (value) => value >= new Date(),
-        message: 'Start datetime cannot be in the past',
-      },
     },
     bookingDuration: {
       type: Number,
