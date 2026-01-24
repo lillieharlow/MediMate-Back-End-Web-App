@@ -31,6 +31,9 @@ const validateSignup = require('../middlewares/validateSignup');
 const User = require('../models/User');
 const UserType = require('../models/UserTypes');
 const createError = require('../utils/httpError');
+const validateFields = require('../middlewares/validateFields');
+const profileController = require('../controllers/profileController');
+const PatientProfile = require('../models/PatientProfile');
 
 const router = express.Router();
 
@@ -38,8 +41,9 @@ const router = express.Router();
 router.post(
   '/signup',
   validateSignup,
+  validateFields(['email', 'password', 'firstName', 'middleName', 'lastName', 'dateOfBirth', 'phone']),
   asyncHandler(async (request, response) => {
-    const { email, password } = request.body;
+    const { email, password, firstName, middleName, lastName, dateOfBirth, phone } = request.body;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -57,6 +61,14 @@ router.post(
 
     const user = new User({ email, hashedPassword, userType: patientType._id });
     await user.save();
+
+    await profileController.createProfile(PatientProfile, user._id, {
+      firstName,
+      middleName,
+      lastName,
+      dateOfBirth,
+      phone,
+    });
 
     response.status(201).json({
       success: true,
