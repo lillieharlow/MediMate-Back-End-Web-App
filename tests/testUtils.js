@@ -31,7 +31,7 @@ const createStaffUserAndToken = async (app) => {
   const userId = user._id;
   await User.findByIdAndUpdate(userId, { userType: staffType._id });
   const loginRes = await request(app).post('/api/v1/auth/login').send(staffUser);
-  return { token: loginRes.body.token, userId };
+  return { token: loginRes.body.token, userId: String(userId) };
 };
 
 const createDoctorUserAndToken = async (app) => {
@@ -46,7 +46,7 @@ const createDoctorUserAndToken = async (app) => {
   const userId = user._id;
   await User.findByIdAndUpdate(userId, { userType: doctorType._id });
   const loginRes = await request(app).post('/api/v1/auth/login').send(doctorUser);
-  return { token: loginRes.body.token, userId };
+  return { token: loginRes.body.token, userId: String(userId) };
 };
 
 const createPatientUserAndToken = async (app) => {
@@ -61,7 +61,7 @@ const createPatientUserAndToken = async (app) => {
   const userId = user._id;
   await User.findByIdAndUpdate(userId, { userType: patientType._id });
   const loginRes = await request(app).post('/api/v1/auth/login').send(patientUser);
-  return { token: loginRes.body.token, userId };
+  return { token: loginRes.body.token, userId: String(userId) };
 };
 
 const getFutureDate = (ms = 60 * 60 * 1000) => new Date(Date.now() + ms).toISOString();

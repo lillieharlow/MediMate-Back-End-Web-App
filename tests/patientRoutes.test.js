@@ -2,8 +2,6 @@
  * Patient Routes Tests
  *
  * Tests CRUD operations for patient profiles:
- * - Create patient profile (patient token)
- * - List all patients (non-staff receives 403)
  * - Get one patient by userId (patient can access own profile)
  * - Patient cannot access another patient's profile (403 forbidden)
  * - Patient can update own profile
@@ -21,34 +19,17 @@ describe('Patient Routes: CRUD operations for /api/v1/patients', () => {
   let userId;
 
   beforeEach(async () => {
-    const signupRes = await request(app).post('/api/v1/auth/signup').send(testData.patientUser);
+    const signupRes = await request(app)
+      .post('/api/v1/auth/signup')
+      .send({
+        ...testData.patientUser,
+        ...testData.validPatient,
+      });
     userId = signupRes.body.userId;
 
     const loginRes = await request(app).post('/api/v1/auth/login').send(testData.patientUser);
     token = loginRes.body.token;
   });
-
-  test('POST /patients - should create a patient profile', async () => {
-    const res = await request(app)
-      .post('/api/v1/patients')
-      .set('Authorization', `Bearer ${token}`)
-      .send(testData.validPatient);
-
-    expect(res.status).toBe(201);
-    expect(res.body.success).toBe(true);
-    expect(res.body.userId).toBe(userId);
-
-    const resDuplicate = await request(app)
-      .post('/api/v1/patients')
-      .set('Authorization', `Bearer ${token}`)
-      .send(testData.validPatient);
-
-    expect(resDuplicate.status).toBe(409);
-  });
-
-  test('POST /patients with a duplicate profile should be prevented', async () => {
-    
-  })
 
   test('GET /patients/:userId - should only get own patient profile', async () => {
     await request(app)

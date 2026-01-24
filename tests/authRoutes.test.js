@@ -14,7 +14,13 @@ describe('Auth Routes: Signup and login for /api/v1/auth', () => {
   const { email, password } = testData.validUser;
 
   test('POST /signup - should register a new user', async () => {
-    const res = await request(app).post('/api/v1/auth/signup').send({ email, password });
+    const res = await request(app)
+      .post('/api/v1/auth/signup')
+      .send({
+        email,
+        password,
+        ...testData.validPatient,
+      });
     expect(res.status).toBe(201);
     expect(res.body.success).toBe(true);
     expect(res.body.userId).toBeDefined();
