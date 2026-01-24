@@ -41,7 +41,15 @@ const router = express.Router();
 router.post(
   '/signup',
   validateSignup,
-  validateFields(['email', 'password', 'firstName', 'middleName', 'lastName', 'dateOfBirth', 'phone']),
+  validateFields([
+    'email',
+    'password',
+    'firstName',
+    'middleName',
+    'lastName',
+    'dateOfBirth',
+    'phone',
+  ]),
   asyncHandler(async (request, response) => {
     const { email, password, firstName, middleName, lastName, dateOfBirth, phone } = request.body;
 
@@ -60,7 +68,6 @@ router.post(
     );
 
     const user = new User({ email, hashedPassword, userType: patientType._id });
-    await user.save();
 
     await profileController.createProfile(PatientProfile, user._id, {
       firstName,
@@ -70,6 +77,7 @@ router.post(
       phone,
     });
 
+    await user.save();
     response.status(201).json({
       success: true,
       message: 'User created successfully',
@@ -87,12 +95,12 @@ router.post(
 
     const user = await User.findOne({ email }).select('+hashedPassword').populate('userType');
     if (!user) {
-      throw createError('Invalid email or password', 401);
+      throw createError('Invalid email or password', 400);
     }
 
     const match = await bcrypt.compare(password, user.hashedPassword);
     if (!match) {
-      throw createError('Invalid email or password', 401);
+      throw createError('Invalid email or password', 400);
     }
 
     const token = jwt.sign(
