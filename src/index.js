@@ -43,7 +43,12 @@ const bookingRouter = require('./routes/bookingRoutes');
 const app = express();
 
 app.use(require('helmet')());
-app.use(require('cors')({ origin: ['http://localhost:3000', 'http://localhost:5173'], optionsSuccessStatus: 200 })); // Add render URL when deployed
+app.use(
+  require('cors')({
+    origin: ['http://localhost:3000', 'http://localhost:5173'],
+    optionsSuccessStatus: 200,
+  })
+); // Add render URL when deployed
 
 app.use(express.json());
 

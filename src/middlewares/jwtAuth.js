@@ -24,7 +24,7 @@ module.exports = (request, response, next) => {
 
   // Extract token from "Bearer <token>" format
   const token = header.split(' ')[1];
-  
+
   // Verify token and attach user data to request
   try {
     request.user = jwt.verify(token, process.env.JWT_SECRET);

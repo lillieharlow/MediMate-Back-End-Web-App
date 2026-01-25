@@ -10,7 +10,7 @@
 
 const mongoose = require('mongoose');
 const validator = require('validator');
-const { doctorShiftTimeRegex } = require('../utils/regex')
+const { doctorShiftTimeRegex } = require('../utils/regex');
 
 // ========== Doctor Profile Schema ==========
 const DoctorProfileSchema = mongoose.Schema(

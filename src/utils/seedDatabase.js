@@ -69,7 +69,7 @@ async function seedDoctors(count) {
           firstName: `Doc${idx}`,
           lastName: `McDoctor${idx}`,
           shiftStartTime: `${String((8 + idx) % 24).padStart(2, '0')}:00`,
-          shiftEndTime: `${String(((8 + idx) % 24 + 8) % 24).padStart(2, '0')}:00`,
+          shiftEndTime: `${String((((8 + idx) % 24) + 8) % 24).padStart(2, '0')}:00`,
         });
       }
       return user._id;
@@ -93,14 +93,14 @@ async function seedPatients(count) {
           userType: patientType._id,
         });
         user.save();
-            await PatientProfile.create({
-              user: user._id,
-              firstName: `Pat${idx}`,
-              lastName: `McPatient${idx}`,
-              dateOfBirth: `1990-${String(idx).padStart(2, '0')}-${String(idx).padStart(2, '0')}`,
-              email,
-              phone: `1415555267${idx}`,
-            });
+        await PatientProfile.create({
+          user: user._id,
+          firstName: `Pat${idx}`,
+          lastName: `McPatient${idx}`,
+          dateOfBirth: `1990-${String(idx).padStart(2, '0')}-${String(idx).padStart(2, '0')}`,
+          email,
+          phone: `1415555267${idx}`,
+        });
       }
       return user._id;
     })
@@ -123,8 +123,8 @@ async function seedBookings(doctorIds, patientIds, count) {
         patientId,
         doctorId,
         bookingStatus: 'confirmed',
-          datetimeStart: start,
-          datetimeEnd: end,
+        datetimeStart: start,
+        datetimeEnd: end,
         bookingDuration: 30,
         patientNotes: `Booking ${idx} notes`,
       });

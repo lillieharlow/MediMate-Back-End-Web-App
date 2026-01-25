@@ -12,7 +12,7 @@
  */
 
 const createError = require('../utils/httpError');
-const { doctorShiftTimeRegex } = require('../utils/regex')
+const { doctorShiftTimeRegex } = require('../utils/regex');
 
 // ========== Doctor shift time validation helper ==========
 function validateDoctorShiftTimes(shiftStartTime, shiftEndTime) {
