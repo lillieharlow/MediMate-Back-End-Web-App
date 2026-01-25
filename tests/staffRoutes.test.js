@@ -78,7 +78,9 @@ describe('Staff Routes: /api/v1/staff', () => {
   });
 
   test('PATCH /staff/userType/:userId - should change user type of profile to doctor', async () => {
-    const patientSignup = await request(app).post('/api/v1/auth/signup').send(testData.patientUser);
+    const patientSignup = await request(app)
+      .post('/api/v1/auth/signup')
+      .send({ ...testData.patientUser, ...testData.validPatient });
     const targetUserId = patientSignup.body.userId;
 
     const res = await request(app)

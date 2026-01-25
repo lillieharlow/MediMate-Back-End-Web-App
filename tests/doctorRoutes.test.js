@@ -13,8 +13,12 @@
 
 const request = require('supertest');
 const app = require('../src/index');
-const { createStaffUserAndToken, createDoctorUserAndToken } = require('./testUtils');
-const { buildDoctorProfilePayload, getFutureDate } = require('./testUtils');
+const {
+  buildDoctorProfilePayload,
+  createStaffUserAndToken,
+  createDoctorUserAndToken,
+  getFutureTime,
+} = require('./testUtils');
 
 describe('Doctor Routes: /api/v1/doctors', () => {
   let staffToken;
@@ -78,7 +82,7 @@ describe('Doctor Routes: /api/v1/doctors', () => {
       .set('Authorization', `Bearer ${staffToken}`)
       .send({ ...doctorPayload, userId: doctorUserId });
 
-    const invalidShiftEnd = getFutureDate(-60 * 60 * 1000); // 1 hour in the past
+    const invalidShiftEnd = getFutureTime(-60 * 60 * 1000); // 1 hour in the past
 
     const res = await request(app)
       .patch(`/api/v1/doctors/${doctorUserId}`)

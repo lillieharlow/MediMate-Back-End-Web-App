@@ -31,6 +31,9 @@ const validateSignup = require('../middlewares/validateSignup');
 const User = require('../models/User');
 const UserType = require('../models/UserTypes');
 const createError = require('../utils/httpError');
+const validateFields = require('../middlewares/validateFields');
+const profileController = require('../controllers/profileController');
+const PatientProfile = require('../models/PatientProfile');
 
 const router = express.Router();
 
@@ -38,8 +41,17 @@ const router = express.Router();
 router.post(
   '/signup',
   validateSignup,
+  validateFields([
+    'email',
+    'password',
+    'firstName',
+    'middleName',
+    'lastName',
+    'dateOfBirth',
+    'phone',
+  ]),
   asyncHandler(async (request, response) => {
-    const { email, password } = request.body;
+    const { email, password, firstName, middleName, lastName, dateOfBirth, phone } = request.body;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -56,8 +68,16 @@ router.post(
     );
 
     const user = new User({ email, hashedPassword, userType: patientType._id });
-    await user.save();
 
+    await profileController.createProfile(PatientProfile, user._id, {
+      firstName,
+      middleName,
+      lastName,
+      dateOfBirth,
+      phone,
+    });
+
+    await user.save();
     response.status(201).json({
       success: true,
       message: 'User created successfully',
@@ -75,12 +95,12 @@ router.post(
 
     const user = await User.findOne({ email }).select('+hashedPassword').populate('userType');
     if (!user) {
-      throw createError('Invalid email or password', 401);
+      throw createError('Invalid email or password', 400);
     }
 
     const match = await bcrypt.compare(password, user.hashedPassword);
     if (!match) {
-      throw createError('Invalid email or password', 401);
+      throw createError('Invalid email or password', 400);
     }
 
     const token = jwt.sign(

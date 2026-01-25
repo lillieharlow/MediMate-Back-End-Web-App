@@ -13,7 +13,9 @@ async function printSeededData() {
 
   const patients = await PatientProfile.find({}).populate('user');
   console.log('\nSeeded patient emails and phone numbers:');
-  patients.forEach((p) => console.log(`Email: ${p.user.email}, Phone: ${p.phone}, DOB: ${p.dateOfBirth}`));
+  patients.forEach((p) =>
+    console.log(`Email: ${p.user.email}, Phone: ${p.phone}, DOB: ${p.dateOfBirth}`)
+  );
 
   await mongoose.disconnect();
 }

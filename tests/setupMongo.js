@@ -51,8 +51,8 @@ const testData = {
     phone: '1234567890',
   },
   validDoctor: {
-    shiftStartTime: null,
-    shiftEndTime: null,
+    shiftStartTime: '08:00',
+    shiftEndTime: '16:00',
     firstName: 'John',
     lastName: 'Doctor',
   },

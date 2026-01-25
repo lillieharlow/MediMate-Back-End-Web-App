@@ -9,6 +9,8 @@
  */
 
 const mongoose = require('mongoose');
+const validator = require('validator');
+const { doctorShiftTimeRegex } = require('../utils/regex');
 
 // ========== Doctor Profile Schema ==========
 const DoctorProfileSchema = mongoose.Schema(
@@ -18,12 +20,22 @@ const DoctorProfileSchema = mongoose.Schema(
       ref: 'User',
     },
     shiftStartTime: {
-      type: Date,
+      type: String,
       required: [true, 'Shift start time is required'],
+      trim: true,
+      validate: {
+        validator: (value) => validator.matches(value, doctorShiftTimeRegex),
+        message: (props) => `${props.value} is not a valid time (HH:MM 24-hour)`,
+      },
     },
     shiftEndTime: {
-      type: Date,
+      type: String,
       required: [true, 'Shift end time is required'],
+      trim: true,
+      validate: {
+        validator: (value) => validator.matches(value, doctorShiftTimeRegex),
+        message: (props) => `${props.value} is not a valid time (HH:MM 24-hour)`,
+      },
     },
     firstName: {
       type: String,
