@@ -68,8 +68,8 @@ async function seedDoctors(count) {
           user: user._id,
           firstName: `Doc${idx}`,
           lastName: `McDoctor${idx}`,
-          shiftStartTime: new Date(Date.now() + 3600 * 1000 * idx),
-          shiftEndTime: new Date(Date.now() + 3600 * 1000 * (idx + 8)),
+          shiftStartTime: `${String((8 + idx) % 24).padStart(2, '0')}:00`,
+          shiftEndTime: `${String(((8 + idx) % 24 + 8) % 24).padStart(2, '0')}:00`,
         });
       }
       return user._id;

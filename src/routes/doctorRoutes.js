@@ -129,6 +129,7 @@ router.delete(
     const { userId } = request.params;
 
     await profileController.deleteProfile(DoctorProfile, userId);
+    await User.deleteOne({ _id: userId });
 
     response.status(200).json({
       success: true,
