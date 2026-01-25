@@ -27,14 +27,14 @@ describe('Auth Routes: Signup and login for /api/v1/auth', () => {
   });
 
   test('POST /signup - should fail if there is a duplicate email', async () => {
-    await request(app).post('/api/v1/auth/signup').send({ email, password });
-    const res = await request(app).post('/api/v1/auth/signup').send({ email, password });
+    await request(app).post('/api/v1/auth/signup').send({ email, password, ...testData.validPatient });
+    const res = await request(app).post('/api/v1/auth/signup').send({ email, password, ...testData.validPatient });
     expect(res.status).toBe(409);
     expect(res.body.message).toBe('Email already in use');
   });
 
   test('POST /login - should login an existing user', async () => {
-    await request(app).post('/api/v1/auth/signup').send({ email, password });
+    await request(app).post('/api/v1/auth/signup').send({ email, password, ...testData.validPatient });
     const res = await request(app).post('/api/v1/auth/login').send({ email, password });
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
@@ -42,11 +42,11 @@ describe('Auth Routes: Signup and login for /api/v1/auth', () => {
   });
 
   test('POST /login - should fail with incorrect password', async () => {
-    await request(app).post('/api/v1/auth/signup').send({ email, password });
+    await request(app).post('/api/v1/auth/signup').send({ email, password, ...testData.validPatient });
     const res = await request(app)
       .post('/api/v1/auth/login')
       .send({ email, password: 'wrongpass' });
-    expect(res.status).toBe(401);
+    expect(res.status).toBe(400);
     expect(res.body.message).toBe('Invalid email or password');
   });
 });

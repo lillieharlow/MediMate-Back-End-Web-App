@@ -66,9 +66,16 @@ const createPatientUserAndToken = async (app) => {
 
 const getFutureDate = (ms = 60 * 60 * 1000) => new Date(Date.now() + ms).toISOString();
 
+const getFutureTime = (ms = 60 * 60 * 1000) => {
+  const date = new Date(Date.now() + ms);
+  const hh = String(date.getHours()).padStart(2, '0');
+  const mm = String(date.getMinutes()).padStart(2, '0');
+  return `${hh}:${mm}`;
+};
+
 const buildDoctorProfilePayload = () => {
-  const start = getFutureDate(); // +1 hour ISO string
-  const end = getFutureDate(90 * 60 * 1000); // +1.5 hours ISO string
+  const start = getFutureTime(); // +1 hour ISO string
+  const end = getFutureTime(90 * 60 * 1000); // +1.5 hours ISO string
   return {
     shiftStartTime: start,
     shiftEndTime: end,
@@ -83,5 +90,6 @@ module.exports = {
   createDoctorUserAndToken,
   createPatientUserAndToken,
   getFutureDate,
+  getFutureTime,
   buildDoctorProfilePayload,
 };
