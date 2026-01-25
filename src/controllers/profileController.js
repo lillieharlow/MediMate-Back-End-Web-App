@@ -12,11 +12,28 @@
  */
 
 const createError = require('../utils/httpError');
+const { doctorShiftTimeRegex } = require('../utils/regex')
 
 // ========== Doctor shift time validation helper ==========
 function validateDoctorShiftTimes(shiftStartTime, shiftEndTime) {
-  if (shiftStartTime && shiftEndTime && new Date(shiftEndTime) <= new Date(shiftStartTime)) {
-    throw createError('Shift end time must be after shift start time', 400);
+  const timeRegex = doctorShiftTimeRegex;
+
+  if (shiftStartTime && !timeRegex.test(shiftStartTime)) {
+    throw createError('Invalid shift start time format; expected HH:MM (24-hour)', 400);
+  }
+  if (shiftEndTime && !timeRegex.test(shiftEndTime)) {
+    throw createError('Invalid shift end time format; expected HH:MM (24-hour)', 400);
+  }
+
+  if (shiftStartTime && shiftEndTime) {
+    const [sh, sm] = shiftStartTime.split(':').map(Number);
+    const [eh, em] = shiftEndTime.split(':').map(Number);
+    const startMinutes = sh * 60 + sm;
+    const endMinutes = eh * 60 + em;
+
+    if (endMinutes <= startMinutes) {
+      throw createError('Shift end time must be after shift start time', 400);
+    }
   }
 }
 
