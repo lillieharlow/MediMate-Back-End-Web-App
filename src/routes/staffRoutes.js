@@ -5,6 +5,7 @@
  * - GET /api/v1/staff/patients                 : List all patients (staff only)
  * - PATCH /api/v1/staff/userType/:userId       : Change user type (staff only)
  * - POST /api/v1/staff                         : Create staff profile (staff only)
+ * - POST /api/v1/staff/createUser              : Create user of any type (staff only)
  * - GET /api/v1/staff                          : List all staff (staff only)
  * - GET /api/v1/staff/users                    : List all profiles of any user type (staff only)
  * - GET /api/v1/staff/:userId                  : Get staff by userId (staff only)
@@ -13,6 +14,7 @@
  */
 
 const express = require('express');
+const bcrypt = require('bcryptjs');
 
 const profileController = require('../controllers/profileController');
 const asyncHandler = require('../middlewares/asyncHandler');
@@ -123,6 +125,72 @@ router.post(
       success: true,
       message: 'Staff profile created successfully',
       userId: staff.user._id,
+    });
+  })
+);
+
+// ========== POST /api/v1/staff — Create staff profile ==========
+// Authorized: Staff only
+router.post(
+  '/createUser',
+  jwtAuth,
+  authorizeUserTypes('staff'),
+  asyncHandler(async (request, response) => {
+    const { userType, email, password, firstName, lastName } = request.body;
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      throw createError('Email already in use', 409);
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const userTypeObj = await UserType.findOneAndUpdate(
+      { typeName: userType },
+      { $setOnInsert: { typeName: userType } },
+      { upsert: true, new: true }
+    );
+
+    const user = new User({ email, hashedPassword, userType: userTypeObj._id });
+    await user.validate();
+
+    let profile;
+
+    if (userType === 'patient') {
+      const { middleName, dateOfBirth, phone } = request.body;
+      profile = await profileController.createProfile(PatientProfile, user._id, {
+        firstName,
+        middleName,
+        lastName,
+        dateOfBirth,
+        phone,
+      });
+    }
+    if (userType === 'doctor') {
+      const { shiftStartTime, shiftEndTime } = request.body;
+      profile = await profileController.createProfile(DoctorProfile, user._id, {
+        firstName,
+        lastName,
+        shiftStartTime,
+        shiftEndTime,
+      });
+    }
+    if (userType === 'staff') {
+      profile = await profileController.createProfile(StaffProfile, user._id, {
+        firstName,
+        lastName,
+      });
+    }
+
+    await user.save();
+    response.status(201).json({
+      success: true,
+      message: 'User created successfully',
+      userId: user._id,
+      data: await profile.populate({
+        path: 'user',
+        populate: { path: 'userType' },
+      }),
     });
   })
 );
