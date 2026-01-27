@@ -113,18 +113,16 @@ async function seedBookings(doctorIds, patientIds, count) {
   await Promise.all(
     Array.from({ length: count }, async (_, i) => {
       const idx = i + 1;
-      const doctorId = doctorIds[idx % doctorIds.length];
-      const patientId = patientIds[idx % patientIds.length];
+      const doctorId = new mongoose.Types.ObjectId(doctorIds[idx % doctorIds.length]);
+      const patientId = new mongoose.Types.ObjectId(patientIds[idx % patientIds.length]);
       const today = new Date();
       today.setHours(7, 0, 0, 0);
       const start = new Date(today.getTime() + (idx - 1) * 3600 * 1000); // idx booking, each 1 hour apart
-      const end = new Date(start.getTime() + 30 * 60000); // 30 min duration
       await Bookings.create({
         patientId,
         doctorId,
         bookingStatus: 'confirmed',
-        datetimeStart: start,
-        datetimeEnd: end,
+        datetimeStart: start.toISOString(), // ISO string
         bookingDuration: 30,
         patientNotes: `Booking ${idx} notes`,
       });

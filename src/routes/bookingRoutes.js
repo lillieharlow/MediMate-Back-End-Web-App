@@ -15,6 +15,7 @@
 
 const express = require('express');
 
+const mongoose = require('mongoose');
 const asyncHandler = require('../middlewares/asyncHandler');
 const authorizeUserTypes = require('../middlewares/authorizeUserTypes');
 const jwtAuth = require('../middlewares/jwtAuth');
@@ -31,22 +32,25 @@ router.get(
   jwtAuth,
   authorizeUserTypes('staff'),
   asyncHandler(async (request, response) => {
-    const bookings = await Bookings.find({});
-    const requester = await User.findById(request.user.userId).populate('userType');
-    const requesterType = requester.userType.typeName;
-    let filtered = bookings;
-    if (requesterType !== 'doctor') {
-      filtered = bookings.map((b) => {
-        const obj = b.toObject();
-        delete obj.doctorNotes;
-        return obj;
-      });
-    }
-    response.status(200).json({
-      success: true,
-      count: filtered.length,
-      data: filtered,
-    });
+const bookings = await Bookings.find({});
+const requester = await User.findById(request.user.userId).populate('userType');
+const requesterType = requester.userType.typeName;
+let filtered = bookings;
+if (requesterType !== 'doctor') {
+  filtered = bookings.map((b) => {
+    const obj = b.toObject();
+    obj.doctorId = obj.doctorId.toString();
+    obj.patientId = obj.patientId.toString();
+    obj.datetimeStart = new Date(obj.datetimeStart).toISOString();
+    delete obj.doctorNotes;
+    return obj;
+  });
+}
+response.status(200).json({
+  success: true,
+  count: filtered.length,
+  data: filtered,
+});
   })
 );
 
@@ -87,7 +91,7 @@ router.get(
 router.get(
   '/doctors/:userId',
   jwtAuth,
-  authorizeUserTypes('staff', 'doctor'),
+  authorizeUserTypes('staff', 'doctor', 'patient'),
   asyncHandler(async (request, response) => {
     const { userId } = request.params;
     const requester = await User.findById(request.user.userId).populate('userType');
@@ -97,11 +101,13 @@ router.get(
       throw createError('You do not have permission to access this profile', 403);
     }
 
-    const bookings = await Bookings.find({ doctorId: userId });
+    const bookings = await Bookings.find({ doctorId: new mongoose.Types.ObjectId(userId) });
     let filtered = bookings;
     if (requesterType !== 'doctor') {
       filtered = bookings.map((b) => {
         const obj = b.toObject();
+        obj.doctorId = obj.doctorId.toString();
+        obj.patientId = obj.patientId.toString();
         delete obj.doctorNotes;
         return obj;
       });
@@ -188,9 +194,28 @@ router.post(
     });
     if (overlap) {
       throw createError(
-        'There are no available appointments at this time with your choosen Doctor.',
+        'There are no available appointments at this time with your choosen Doctor, please select another time.',
         409
       );
+    }
+
+    // Overlap check: Prevent patient from having overlapping bookings with any doctor
+    const patientOverlap = await Bookings.findOne({
+      patientId,
+      $or: [
+        {
+          datetimeStart: { $lt: end },
+          $expr: {
+            $gte: [{ $add: ['$datetimeStart', { $multiply: ['$bookingDuration', 60000] }] }, start],
+          },
+        },
+        {
+          datetimeStart: { $gte: start, $lt: end },
+        },
+      ],
+    });
+    if (patientOverlap) {
+      throw createError('This appointment date/time is already taken, please select another time.', 409);
     }
 
     const booking = await Bookings.create({

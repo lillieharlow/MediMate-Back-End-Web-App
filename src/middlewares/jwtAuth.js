@@ -29,7 +29,7 @@ module.exports = (request, response, next) => {
   try {
     request.user = jwt.verify(token, process.env.JWT_SECRET);
     return next();
-  } catch (error) {
+  } catch {
     return response.status(401).json({
       success: false,
       status: 401,
