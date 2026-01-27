@@ -32,25 +32,25 @@ router.get(
   jwtAuth,
   authorizeUserTypes('staff'),
   asyncHandler(async (request, response) => {
-const bookings = await Bookings.find({});
-const requester = await User.findById(request.user.userId).populate('userType');
-const requesterType = requester.userType.typeName;
-let filtered = bookings;
-if (requesterType !== 'doctor') {
-  filtered = bookings.map((b) => {
-    const obj = b.toObject();
-    obj.doctorId = obj.doctorId.toString();
-    obj.patientId = obj.patientId.toString();
-    obj.datetimeStart = new Date(obj.datetimeStart).toISOString();
-    delete obj.doctorNotes;
-    return obj;
-  });
-}
-response.status(200).json({
-  success: true,
-  count: filtered.length,
-  data: filtered,
-});
+    const bookings = await Bookings.find({});
+    const requester = await User.findById(request.user.userId).populate('userType');
+    const requesterType = requester.userType.typeName;
+    let filtered = bookings;
+    if (requesterType !== 'doctor') {
+      filtered = bookings.map((b) => {
+        const obj = b.toObject();
+        obj.doctorId = obj.doctorId.toString();
+        obj.patientId = obj.patientId.toString();
+        obj.datetimeStart = new Date(obj.datetimeStart).toISOString();
+        delete obj.doctorNotes;
+        return obj;
+      });
+    }
+    response.status(200).json({
+      success: true,
+      count: filtered.length,
+      data: filtered,
+    });
   })
 );
 
@@ -164,6 +164,8 @@ router.post(
   asyncHandler(async (request, response) => {
     const { patientId, doctorId, bookingStatus, datetimeStart, bookingDuration, patientNotes } =
       request.body;
+    const start = new Date(datetimeStart);
+    const end = new Date(start.getTime() + (parseInt(bookingDuration, 10) || 15) * 60000);
 
     // Only allow bookings in the future
     if (new Date(datetimeStart) < new Date()) {
@@ -171,26 +173,16 @@ router.post(
     }
 
     // Overlap check: Prevent doctor from having overlapping bookings
-    const start = new Date(datetimeStart);
-    if (start < new Date()) {
-      throw createError('Cannot create a booking in the past.', 400);
-    }
-
-    // Overlap check: Prevent doctor from having overlapping bookings
-    const end = new Date(start.getTime() + bookingDuration * 60000);
     const overlap = await Bookings.findOne({
-      doctorId,
-      $or: [
-        {
-          datetimeStart: { $lt: end },
-          $expr: {
-            $gte: [{ $add: ['$datetimeStart', { $multiply: ['$bookingDuration', 60000] }] }, start],
+      doctorId: new mongoose.Types.ObjectId(doctorId),
+      $expr: {
+        $and: [
+          { $lt: ['$datetimeStart', end] },
+          {
+            $gt: [{ $add: ['$datetimeStart', { $multiply: ['$bookingDuration', 60000] }] }, start],
           },
-        },
-        {
-          datetimeStart: { $gte: start, $lt: end },
-        },
-      ],
+        ],
+      },
     });
     if (overlap) {
       throw createError(
@@ -202,20 +194,20 @@ router.post(
     // Overlap check: Prevent patient from having overlapping bookings with any doctor
     const patientOverlap = await Bookings.findOne({
       patientId,
-      $or: [
-        {
-          datetimeStart: { $lt: end },
-          $expr: {
-            $gte: [{ $add: ['$datetimeStart', { $multiply: ['$bookingDuration', 60000] }] }, start],
+      $expr: {
+        $and: [
+          { $lt: ['$datetimeStart', end] },
+          {
+            $gt: [{ $add: ['$datetimeStart', { $multiply: ['$bookingDuration', 60000] }] }, start],
           },
-        },
-        {
-          datetimeStart: { $gte: start, $lt: end },
-        },
-      ],
+        ],
+      },
     });
     if (patientOverlap) {
-      throw createError('This appointment date/time is already taken, please select another time.', 409);
+      throw createError(
+        'This appointment date/time is already taken, please select another time.',
+        409
+      );
     }
 
     const booking = await Bookings.create({

@@ -12,7 +12,6 @@ const User = require('../models/User');
 const UserType = require('../models/UserTypes');
 const DoctorProfile = require('../models/DoctorProfile');
 const PatientProfile = require('../models/PatientProfile');
-const Bookings = require('../models/Bookings');
 const StaffProfile = require('../models/StaffProfile');
 
 // ========== Seed User Types ==========
@@ -108,29 +107,6 @@ async function seedPatients(count) {
   return patientIds;
 }
 
-// ========== Seed Bookings ==========
-async function seedBookings(doctorIds, patientIds, count) {
-  await Promise.all(
-    Array.from({ length: count }, async (_, i) => {
-      const idx = i + 1;
-      const doctorId = new mongoose.Types.ObjectId(doctorIds[idx % doctorIds.length]);
-      const patientId = new mongoose.Types.ObjectId(patientIds[idx % patientIds.length]);
-      const today = new Date();
-      today.setHours(7, 0, 0, 0);
-      const start = new Date(today.getTime() + (idx - 1) * 3600 * 1000); // idx booking, each 1 hour apart
-      await Bookings.create({
-        patientId,
-        doctorId,
-        bookingStatus: 'confirmed',
-        datetimeStart: start.toISOString(), // ISO string
-        bookingDuration: 30,
-        patientNotes: `Booking ${idx} notes`,
-      });
-    })
-  );
-  console.log('Finished seeding bookings.');
-}
-
 // ========== Main Seed Function ==========
 const seedDatabase = async () => {
   await mongoose.connection.dropDatabase();
@@ -138,9 +114,8 @@ const seedDatabase = async () => {
 
   await seedUserTypes();
   await seedStaffUser();
-  const doctorIds = await seedDoctors(4);
-  const patientIds = await seedPatients(6);
-  await seedBookings(doctorIds, patientIds, 20);
+  await seedDoctors(4);
+  await seedPatients(6);
   console.log('Database seeded successfully!');
 };
 
