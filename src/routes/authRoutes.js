@@ -68,6 +68,7 @@ router.post(
     );
 
     const user = new User({ email, hashedPassword, userType: patientType._id });
+    await user.validate();
 
     await profileController.createProfile(PatientProfile, user._id, {
       firstName,
