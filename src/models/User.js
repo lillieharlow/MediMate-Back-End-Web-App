@@ -39,7 +39,7 @@ const UserSchema = mongoose.Schema(
 
 // ========== JSON Transformation ==========
 UserSchema.set('toJSON', {
-  transform: (doc, returnObject) => {
+  transform: (returnObject) => {
     const sanitized = { ...returnObject };
     delete sanitized.hashedPassword;
     return sanitized;

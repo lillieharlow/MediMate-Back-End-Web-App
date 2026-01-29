@@ -47,6 +47,8 @@ app.use(
   require('cors')({
     origin: ['http://localhost:3000', 'http://localhost:5173'],
     optionsSuccessStatus: 200,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: false,
   })
 ); // Add render URL when deployed
 

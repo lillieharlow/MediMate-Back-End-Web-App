@@ -81,7 +81,7 @@ router.get(
 
     response.status(200).json({
       success: true,
-      data: patient,
+      data: JSON.parse(JSON.stringify(patient)),
     });
   })
 );

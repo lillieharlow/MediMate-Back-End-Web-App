@@ -12,7 +12,6 @@ const User = require('../models/User');
 const UserType = require('../models/UserTypes');
 const DoctorProfile = require('../models/DoctorProfile');
 const PatientProfile = require('../models/PatientProfile');
-const Bookings = require('../models/Bookings');
 const StaffProfile = require('../models/StaffProfile');
 
 // ========== Seed User Types ==========
@@ -50,26 +49,56 @@ const seedStaffUser = async () => {
 };
 
 // ========== Seed Doctors ==========
-async function seedDoctors(count) {
+async function seedDoctors(_count) {
   const doctorType = await UserType.findOne({ typeName: 'doctor' });
+  const doctors = [
+    {
+      email: 'doctor1@medimate.com',
+      firstName: 'Gregory',
+      lastName: 'House',
+      shiftStartTime: '08:00',
+      shiftEndTime: '16:00',
+    },
+    {
+      email: 'doctor2@medimate.com',
+      firstName: 'Meredith',
+      lastName: 'Grey',
+      shiftStartTime: '09:00',
+      shiftEndTime: '17:00',
+    },
+    {
+      email: 'doctor3@medimate.com',
+      firstName: 'John',
+      lastName: 'Dorian',
+      shiftStartTime: '10:00',
+      shiftEndTime: '18:00',
+    },
+    {
+      email: 'doctor4@medimate.com',
+      firstName: 'Lisa',
+      lastName: 'Cuddy',
+      shiftStartTime: '11:00',
+      shiftEndTime: '19:00',
+    },
+  ];
   const doctorIds = await Promise.all(
-    Array.from({ length: count }, async (_, i) => {
-      const idx = i + 1;
-      const email = `doctor${idx}@medimate.com`;
-      let user = await User.findOne({ email });
+    doctors.map(async (doc) => {
+      let user = await User.findOne({ email: doc.email });
       if (!user) {
         user = await User.create({
-          email,
+          email: doc.email,
           hashedPassword: await bcrypt.hash('doctor123', 10),
           userType: doctorType._id,
         });
-        user.save();
+      }
+      const profile = await DoctorProfile.findOne({ user: user._id });
+      if (!profile) {
         await DoctorProfile.create({
           user: user._id,
-          firstName: `Doc${idx}`,
-          lastName: `McDoctor${idx}`,
-          shiftStartTime: `${String((8 + idx) % 24).padStart(2, '0')}:00`,
-          shiftEndTime: `${String((((8 + idx) % 24) + 8) % 24).padStart(2, '0')}:00`,
+          firstName: doc.firstName,
+          lastName: doc.lastName,
+          shiftStartTime: doc.shiftStartTime,
+          shiftEndTime: doc.shiftEndTime,
         });
       }
       return user._id;
@@ -79,58 +108,77 @@ async function seedDoctors(count) {
 }
 
 // ========== Seed Patients ==========
-async function seedPatients(count) {
+async function seedPatients(_count) {
   const patientType = await UserType.findOne({ typeName: 'patient' });
+  const patients = [
+    {
+      email: 'patient1@medimate.com',
+      firstName: 'James',
+      lastName: 'Wilson',
+      dateOfBirth: '1990-01-01',
+      phone: '14155552671',
+    },
+    {
+      email: 'patient2@medimate.com',
+      firstName: 'Allison',
+      lastName: 'Cameron',
+      dateOfBirth: '1991-02-02',
+      phone: '14155552672',
+    },
+    {
+      email: 'patient3@medimate.com',
+      firstName: 'Robert',
+      lastName: 'Chase',
+      dateOfBirth: '1992-03-03',
+      phone: '14155552673',
+    },
+    {
+      email: 'patient4@medimate.com',
+      firstName: 'Remy',
+      lastName: 'Hadley',
+      dateOfBirth: '1993-04-04',
+      phone: '14155552674',
+    },
+    {
+      email: 'patient5@medimate.com',
+      firstName: 'Eric',
+      lastName: 'Foreman',
+      dateOfBirth: '1994-05-05',
+      phone: '14155552675',
+    },
+    {
+      email: 'patient6@medimate.com',
+      firstName: 'Chris',
+      lastName: 'Taub',
+      dateOfBirth: '1995-06-06',
+      phone: '14155552676',
+    },
+  ];
   const patientIds = await Promise.all(
-    Array.from({ length: count }, async (_, i) => {
-      const idx = i + 1;
-      const email = `patient${idx}@medimate.com`;
-      let user = await User.findOne({ email });
+    patients.map(async (pat) => {
+      let user = await User.findOne({ email: pat.email });
       if (!user) {
         user = await User.create({
-          email,
+          email: pat.email,
           hashedPassword: await bcrypt.hash('patient123', 10),
           userType: patientType._id,
         });
-        user.save();
+      }
+      const profile = await PatientProfile.findOne({ user: user._id });
+      if (!profile) {
         await PatientProfile.create({
           user: user._id,
-          firstName: `Pat${idx}`,
-          lastName: `McPatient${idx}`,
-          dateOfBirth: `1990-${String(idx).padStart(2, '0')}-${String(idx).padStart(2, '0')}`,
-          email,
-          phone: `1415555267${idx}`,
+          firstName: pat.firstName,
+          lastName: pat.lastName,
+          dateOfBirth: pat.dateOfBirth,
+          email: pat.email,
+          phone: pat.phone,
         });
       }
       return user._id;
     })
   );
   return patientIds;
-}
-
-// ========== Seed Bookings ==========
-async function seedBookings(doctorIds, patientIds, count) {
-  await Promise.all(
-    Array.from({ length: count }, async (_, i) => {
-      const idx = i + 1;
-      const doctorId = doctorIds[idx % doctorIds.length];
-      const patientId = patientIds[idx % patientIds.length];
-      const today = new Date();
-      today.setHours(7, 0, 0, 0);
-      const start = new Date(today.getTime() + (idx - 1) * 3600 * 1000); // idx booking, each 1 hour apart
-      const end = new Date(start.getTime() + 30 * 60000); // 30 min duration
-      await Bookings.create({
-        patientId,
-        doctorId,
-        bookingStatus: 'confirmed',
-        datetimeStart: start,
-        datetimeEnd: end,
-        bookingDuration: 30,
-        patientNotes: `Booking ${idx} notes`,
-      });
-    })
-  );
-  console.log('Finished seeding bookings.');
 }
 
 // ========== Main Seed Function ==========
@@ -140,9 +188,9 @@ const seedDatabase = async () => {
 
   await seedUserTypes();
   await seedStaffUser();
-  const doctorIds = await seedDoctors(4);
-  const patientIds = await seedPatients(6);
-  await seedBookings(doctorIds, patientIds, 20);
+  await seedDoctors(4);
+  await seedPatients(6);
+
   console.log('Database seeded successfully!');
 };
 

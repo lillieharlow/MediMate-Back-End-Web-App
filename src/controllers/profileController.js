@@ -56,10 +56,9 @@ const createProfile = async (Model, userId, profileData) => {
 
 // ========== Get Profile By ID ==========
 const getProfileById = async (Model, userId) => {
-  const profile = await Model.findOne({ user: userId }).populate({
-    path: 'user',
-    populate: { path: 'userType' },
-  });
+  const profile = await Model.findOne({ user: userId })
+    .populate({ path: 'user', populate: { path: 'userType' } })
+    .lean();
 
   if (!profile) {
     throw createError('Profile not found', 404);
@@ -78,8 +77,8 @@ const getAllProfiles = async (Model) => {
 const updateProfile = async (Model, userId, updateData) => {
   if (Model.modelName === 'DoctorProfile') {
     const current = await Model.findOne({ user: userId });
-    const start = updateData.shiftStartTime || (current && current.shiftStartTime);
-    const end = updateData.shiftEndTime || (current && current.shiftEndTime);
+    const start = updateData.shiftStartTime || (current?.shiftStartTime);
+    const end = updateData.shiftEndTime || (current?.shiftEndTime);
     validateDoctorShiftTimes(start, end);
   }
   const updated = await Model.findOneAndUpdate({ user: userId }, updateData, {
