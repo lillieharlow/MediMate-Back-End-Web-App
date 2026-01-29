@@ -56,10 +56,9 @@ const createProfile = async (Model, userId, profileData) => {
 
 // ========== Get Profile By ID ==========
 const getProfileById = async (Model, userId) => {
-  const profile = await Model.findOne({ user: userId }).populate({
-    path: 'user',
-    populate: { path: 'userType' },
-  });
+  const profile = await Model.findOne({ user: userId })
+    .populate({ path: 'user', populate: { path: 'userType' } })
+    .lean();
 
   if (!profile) {
     throw createError('Profile not found', 404);
