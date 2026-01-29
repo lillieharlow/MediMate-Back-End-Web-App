@@ -130,7 +130,7 @@ router.get(
     let doctorId = userId;
     try {
       doctorId = new mongoose.Types.ObjectId(userId);
-    } catch (e) {
+    } catch {
       console.error('[ERROR] Invalid doctorId format:', userId);
       throw createError('Invalid doctorId format', 400);
     }
