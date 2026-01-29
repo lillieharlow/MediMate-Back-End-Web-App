@@ -77,8 +77,8 @@ const getAllProfiles = async (Model) => {
 const updateProfile = async (Model, userId, updateData) => {
   if (Model.modelName === 'DoctorProfile') {
     const current = await Model.findOne({ user: userId });
-    const start = updateData.shiftStartTime || (current && current.shiftStartTime);
-    const end = updateData.shiftEndTime || (current && current.shiftEndTime);
+    const start = updateData.shiftStartTime || (current?.shiftStartTime);
+    const end = updateData.shiftEndTime || (current?.shiftEndTime);
     validateDoctorShiftTimes(start, end);
   }
   const updated = await Model.findOneAndUpdate({ user: userId }, updateData, {
