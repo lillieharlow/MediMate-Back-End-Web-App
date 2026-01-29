@@ -30,11 +30,12 @@ router.get(
   authorizeUserTypes('staff', 'patient'),
   asyncHandler(async (_request, response) => {
     const doctors = await profileController.getAllProfiles(DoctorProfile);
-
+    // Convert each doctor to a plain object to avoid circular structure errors
+    const doctorObjs = doctors.map(doc => (typeof doc.toObject === 'function' ? doc.toObject() : doc));
     response.status(200).json({
       success: true,
-      count: doctors.length,
-      data: doctors,
+      count: doctorObjs.length,
+      data: doctorObjs,
     });
   })
 );

@@ -27,7 +27,7 @@ const UserTypeSchema = mongoose.Schema(
 );
 
 UserTypeSchema.set('toJSON', {
-  transform: (doc, ret) => {
+  transform: (ret) => {
     if (ret._id) {
       // eslint-disable no-param-reassign
       ret.type_id = ret._id;
