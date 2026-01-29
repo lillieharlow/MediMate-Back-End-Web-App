@@ -77,7 +77,7 @@ router.patch(
   authorizeUserTypes('staff'),
   asyncHandler(async (request, response) => {
     const { userId } = request.params;
-    const { typeName } = request.body;
+    const { typeName, profileData } = request.body;
 
     if (!typeName) {
       throw createError('typeName is required', 400);
@@ -88,20 +88,37 @@ router.patch(
       throw createError('User type not found', 404);
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { userType: userType._id },
-      { new: true }
-    ).populate('userType');
+    const updateUser = await User.findById(userId);
 
-    if (!updatedUser) {
+    if (!updateUser) {
       throw createError('User not found', 404);
     }
+
+    const profileModels = {
+      patient: PatientProfile,
+      doctor: DoctorProfile,
+      staff: StaffProfile,
+    };
+
+    const Model = profileModels[typeName];
+    await updateUser.populate('userType');
+    const PrevModel = profileModels[updateUser.userType.typeName];
+    if (!Model || !PrevModel) {
+      throw createError('Unexpected error occured', 500);
+    }
+
+    const newProfile = await profileController.createProfile(Model, updateUser._id, profileData);
+    updateUser.userType = userType._id;
+    await profileController.deleteProfile(PrevModel, updateUser._id);
+    await updateUser.save();
 
     response.status(200).json({
       success: true,
       message: 'User type updated successfully',
-      data: updatedUser,
+      data: await newProfile.populate({
+        path: 'user',
+        populate: { path: 'userType' },
+      }),
     });
   })
 );

@@ -86,7 +86,7 @@ describe('Staff Routes: /api/v1/staff', () => {
     const res = await request(app)
       .patch(`/api/v1/staff/userType/${targetUserId}`)
       .set('Authorization', `Bearer ${staffToken}`)
-      .send({ typeName: 'doctor' });
+      .send({ typeName: 'doctor', profileData: testData.validDoctor});
 
     expect(res.status).toBe(200);
     expect(res.body.data.userType.typeName).toBe('doctor');
